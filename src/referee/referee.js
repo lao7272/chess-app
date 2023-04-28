@@ -1,7 +1,7 @@
 import { samePosition } from "../Constants";
 
 export default class Referee {
-    tileIsOccupiedOrCaptured(currentPosition, boardState, team) {
+    tileIsEmptyOrCaptured(currentPosition, boardState, team) {
         return (!this.tileIsOccupied(currentPosition, boardState) || this.pieceIsCaptured(currentPosition, boardState, team));
     }
     tileIsOccupied (currentPosition, boardState) {
@@ -50,17 +50,105 @@ export default class Referee {
                     // TOP AND BOTTOM
                     if (currentPosition.y - initialPosition.y === 2 * i) {
                         if (currentPosition.x - initialPosition.x === j) {
-                            if (this.tileIsOccupiedOrCaptured(currentPosition, boardState, team)) return true;
+                            if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
                         }
                     } 
                     // RIGHT AND LEFT
                     if (currentPosition.x - initialPosition.x === 2 * i) {
                         if(currentPosition.y - initialPosition.y === j) {
-                            if (this.tileIsOccupiedOrCaptured(currentPosition, boardState, team)) return true;  
+                            if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;  
                         }
                     }
                 }
             }
+        } else if (type=== "BISHOP") {
+            for (let i = 1; i < 8; i++) {
+                // UPPER RIGHT
+                if (currentPosition.x > initialPosition.x && currentPosition.y > initialPosition.y ) {
+                    let passedTile = {x: initialPosition.x + i, y: initialPosition.y + i};
+                    if (samePosition(passedTile, currentPosition)) {
+                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if(this.tileIsOccupied(passedTile, boardState)) break;
+                    }
+                }
+                // UPPER LEFT
+                if (currentPosition.x < initialPosition.x && currentPosition.y > initialPosition.y ) {
+                    let passedTile = {x: initialPosition.x - i, y: initialPosition.y + i}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if(this.tileIsOccupied(passedTile, boardState)) break;
+                    }
+                }
+                
+                // BOTTOM RIGHT
+                if (currentPosition.x > initialPosition.x && currentPosition.y < initialPosition.y ) {
+                    let passedTile = {x: initialPosition.x + i, y: initialPosition.y - i}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if(this.tileIsOccupied(passedTile, boardState)) break;
+                    }
+                }
+                // BOTTOM LEFT
+                if (currentPosition.x < initialPosition.x && currentPosition.y < initialPosition.y ) {
+                    let passedTile = {x: initialPosition.x - i, y: initialPosition.y - i}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if(this.tileIsOccupied(passedTile, boardState)) break;
+                    }
+                }
+            }
+        } else if (type=== "ROOK") {
+            for (let i = 1; i < 8; i++) {
+                // RIGHT
+                if (currentPosition.x > initialPosition.x) {
+                    const passedTile = {x: initialPosition.x + i, y: initialPosition.y}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if (this.tileIsOccupied(passedTile, boardState)) {
+                            break;
+                        }
+                    }
+                }
+                // LEFT
+                if (currentPosition.x < initialPosition.x) {
+                    const passedTile = {x: initialPosition.x - i, y: initialPosition.y}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if (this.tileIsOccupied(passedTile, boardState)) {
+                            break;
+                        }
+                    }
+                }
+                //TOP
+                if (currentPosition.y > initialPosition.y) {
+                    const passedTile = {x: initialPosition.x, y: initialPosition.y + i}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if (this.tileIsOccupied(passedTile, boardState)) {
+                            break;
+                        }
+                    }
+                }
+                // BOTTOM
+                if (currentPosition.y < initialPosition.y) {
+                    const passedTile = {x: initialPosition.x, y: initialPosition.y - i}
+                    if (samePosition(passedTile, currentPosition)) {
+                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+                    } else {
+                        if (this.tileIsOccupied(passedTile, boardState)) {
+                            break;
+                        }
+                    }
+                }
+            }
+            
         }
 
         return false;
