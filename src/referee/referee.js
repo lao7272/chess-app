@@ -1,10 +1,10 @@
-import { samePosition } from "../Constants";
+import {samePosition} from "../Constants";
 
 export default class Referee {
     tileIsEmptyOrCaptured(currentPosition, boardState, team) {
         return (!this.tileIsOccupied(currentPosition, boardState) || this.pieceIsCaptured(currentPosition, boardState, team));
     }
-    tileIsOccupied (currentPosition, boardState) {
+    tileIsOccupied(currentPosition, boardState) {
         const piece = boardState.find(p => samePosition(p.position, currentPosition));
         if (piece) return true;
         return false;
@@ -14,143 +14,106 @@ export default class Referee {
         if (piece) return true;
         return false;
     }
-    isEnPassantCapture (initialPosition, currentPosition, boardState, team, type){
+    isEnPassantCapture(initialPosition, currentPosition, boardState, team, type) {
         const pawnDirection = team === 'white' ? 1 : -1;
         if (type === 'PAWN') {
-            if((currentPosition.x - initialPosition.x === -1 || currentPosition.x - initialPosition.x === 1) && currentPosition.y - initialPosition.y === pawnDirection){
-                const piece = boardState.find(p => samePosition(p.position, {x: currentPosition.x, y: currentPosition.y - pawnDirection}) && p.enPassant === true);
+            if ((currentPosition.x - initialPosition.x === -1 || currentPosition.x - initialPosition.x === 1) && currentPosition.y - initialPosition.y === pawnDirection) {
+                const piece = boardState.find(p => samePosition(p.position, {
+                    x: currentPosition.x,
+                    y: currentPosition.y - pawnDirection
+                }) && p.enPassant === true);
                 if (piece) return true;
-            } 
-            
+            }
+
         }
         return false;
     }
-    isValidMove (initialPosition, currentPosition, boardState, team, type) {
-        // MOVEMENT LOGIC
-        if (type === "PAWN"){
-            const specialRow = team === 'white' ? 1 : 6;
-            const pawnDirection = team === 'white' ? 1 : -1;
+    pawnLogic(initialPosition, currentPosition, boardState, team) {
+        const specialRow = team === 'white' ? 1 : 6;
+        const pawnDirection = team === 'white' ? 1 : -1;
 
-            if (initialPosition.x === currentPosition.x && initialPosition.y === specialRow && currentPosition.y - initialPosition.y === 2 * pawnDirection) {
-                if(!this.tileIsOccupied(currentPosition, boardState) && !this.tileIsOccupied({x: currentPosition.x, y: currentPosition.y - pawnDirection}, boardState)) return true; 
-            } else if (initialPosition.x === currentPosition.x && currentPosition.y - initialPosition.y === pawnDirection) {
-                if(!this.tileIsOccupied(currentPosition, boardState)) return true;
-            }
-            // CAPTURE A PIECE
-            else if(currentPosition.x - initialPosition.x === -1 && currentPosition.y - initialPosition.y === pawnDirection){
-                //CAPTURE IN UPPER OR BOTTOM LEFT CORNER
-                if(this.pieceIsCaptured(currentPosition, boardState, team))return true;
-            } else if(currentPosition.x - initialPosition.x === 1 && currentPosition.y - initialPosition.y === pawnDirection) {
-                //CAPTURE IN UPPER OR BOTTOM RIGHT CORNER
-                if(this.pieceIsCaptured(currentPosition, boardState, team))return true;
-            }
-        } else if (type=== "KNIGHT"){
-            for (let i = -1; i < 2; i+=2) {
-                for (let j = -1; j < 2; j+=2) {
-                    // TOP AND BOTTOM
-                    if (currentPosition.y - initialPosition.y === 2 * i) {
-                        if (currentPosition.x - initialPosition.x === j) {
-                            if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
-                        }
-                    } 
-                    // RIGHT AND LEFT
-                    if (currentPosition.x - initialPosition.x === 2 * i) {
-                        if(currentPosition.y - initialPosition.y === j) {
-                            if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;  
-                        }
-                    }
-                }
-            }
-        } else if (type=== "BISHOP") {
-            for (let i = 1; i < 8; i++) {
-                // UPPER RIGHT
-                if (currentPosition.x > initialPosition.x && currentPosition.y > initialPosition.y ) {
-                    let passedTile = {x: initialPosition.x + i, y: initialPosition.y + i};
-                    if (samePosition(passedTile, currentPosition)) {
-                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if(this.tileIsOccupied(passedTile, boardState)) break;
-                    }
-                }
-                // UPPER LEFT
-                if (currentPosition.x < initialPosition.x && currentPosition.y > initialPosition.y ) {
-                    let passedTile = {x: initialPosition.x - i, y: initialPosition.y + i}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if(this.tileIsOccupied(passedTile, boardState)) break;
-                    }
-                }
-                
-                // BOTTOM RIGHT
-                if (currentPosition.x > initialPosition.x && currentPosition.y < initialPosition.y ) {
-                    let passedTile = {x: initialPosition.x + i, y: initialPosition.y - i}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if(this.tileIsOccupied(passedTile, boardState)) break;
-                    }
-                }
-                // BOTTOM LEFT
-                if (currentPosition.x < initialPosition.x && currentPosition.y < initialPosition.y ) {
-                    let passedTile = {x: initialPosition.x - i, y: initialPosition.y - i}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if(this.tileIsOccupied(passedTile, boardState)) break;
-                    }
-                }
-            }
-        } else if (type=== "ROOK") {
-            for (let i = 1; i < 8; i++) {
-                // RIGHT
-                if (currentPosition.x > initialPosition.x) {
-                    const passedTile = {x: initialPosition.x + i, y: initialPosition.y}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if (this.tileIsOccupied(passedTile, boardState)) {
-                            break;
-                        }
-                    }
-                }
-                // LEFT
-                if (currentPosition.x < initialPosition.x) {
-                    const passedTile = {x: initialPosition.x - i, y: initialPosition.y}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if (this.tileIsOccupied(passedTile, boardState)) {
-                            break;
-                        }
-                    }
-                }
-                //TOP
-                if (currentPosition.y > initialPosition.y) {
-                    const passedTile = {x: initialPosition.x, y: initialPosition.y + i}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if (this.tileIsOccupied(passedTile, boardState)) {
-                            break;
-                        }
-                    }
-                }
-                // BOTTOM
-                if (currentPosition.y < initialPosition.y) {
-                    const passedTile = {x: initialPosition.x, y: initialPosition.y - i}
-                    if (samePosition(passedTile, currentPosition)) {
-                        if(this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-                    } else {
-                        if (this.tileIsOccupied(passedTile, boardState)) {
-                            break;
-                        }
-                    }
-                }
-            }
-            
+        if (initialPosition.x === currentPosition.x && initialPosition.y === specialRow && currentPosition.y - initialPosition.y === 2 * pawnDirection) {
+            if (!this.tileIsOccupied(currentPosition, boardState) && !this.tileIsOccupied({
+                    x: currentPosition.x,
+                    y: currentPosition.y - pawnDirection
+                }, boardState)) return true;
+        } else if (initialPosition.x === currentPosition.x && currentPosition.y - initialPosition.y === pawnDirection) {
+            if (!this.tileIsOccupied(currentPosition, boardState)) return true;
         }
-
+        // CAPTURE A PIECE
+        else if (currentPosition.x - initialPosition.x === -1 && currentPosition.y - initialPosition.y === pawnDirection) {
+            //CAPTURE IN UPPER OR BOTTOM LEFT CORNER
+            if (this.pieceIsCaptured(currentPosition, boardState, team)) return true;
+        } else if (currentPosition.x - initialPosition.x === 1 && currentPosition.y - initialPosition.y === pawnDirection) {
+            //CAPTURE IN UPPER OR BOTTOM RIGHT CORNER
+            if (this.pieceIsCaptured(currentPosition, boardState, team)) return true;
+        }
         return false;
+    }
+    knightLogic(initialPosition, currentPosition, boardState, team) {
+        for (let i = -1; i < 2; i += 2) {
+            for (let j = -1; j < 2; j += 2) {
+                // TOP AND BOTTOM
+                if (currentPosition.y - initialPosition.y === 2 * i) {
+                    if (currentPosition.x - initialPosition.x === j) {
+                        if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
+                    }
+                }
+                // RIGHT AND LEFT
+                if (currentPosition.x - initialPosition.x === 2 * i) {
+                    if (currentPosition.y - initialPosition.y === j) {
+                        if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    bishopLogic(initialPosition, currentPosition, boardState, team) {
+        for (let i = 1; i < 8; i++) {
+            const x = currentPosition.x > initialPosition.x ? initialPosition.x + i : initialPosition.x - i;
+            const y = currentPosition.y > initialPosition.y ? initialPosition.y + i : initialPosition.y - i;
+            let passedTile = {x, y};
+            if (samePosition(passedTile, currentPosition)) {
+                if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+            } else {
+                if (this.tileIsOccupied(passedTile, boardState)) break;
+            }
+        }
+        return false;
+    }
+    rookLogic(initialPosition, currentPosition, boardState, team) {
+        for (let i = 1; i < 8; i++) {
+            const multiplierX = currentPosition.x > initialPosition.x ? 1 : -1;
+            const multiplierY = currentPosition.y > initialPosition.y ? 1 : -1;
+            const x = currentPosition.y === initialPosition.y ? initialPosition.x + i * multiplierX : initialPosition.x;
+            const y = currentPosition.x === initialPosition.x ? initialPosition.y + i * multiplierY : initialPosition.y;
+            const passedTile = {x, y};
+            if (samePosition(passedTile, currentPosition)) {
+                if (this.tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
+            } else {
+                if (this.tileIsOccupied(passedTile, boardState)) break;
+            }
+        }
+        return false;
+    }
+    queenLogic(initialPosition, currentPosition, boardState, team) {
+        return this.bishopLogic(initialPosition, currentPosition, boardState, team) || this.rookLogic(initialPosition, currentPosition, boardState, team);
+    }
+    isValidMove(initialPosition, currentPosition, boardState, team, type) {
+        switch (type) {
+            case 'PAWN':
+                return this.pawnLogic(initialPosition, currentPosition, boardState, team);
+            case 'KNIGHT':
+                return this.knightLogic(initialPosition, currentPosition, boardState, team);
+            case 'BISHOP':
+                return this.bishopLogic(initialPosition, currentPosition, boardState, team);
+            case 'ROOK':
+                return this.rookLogic(initialPosition, currentPosition, boardState, team);
+            case 'QUEEN':
+                return this.queenLogic(initialPosition, currentPosition, boardState, team);
+            default:
+                return false;
+        }
     }
 }
