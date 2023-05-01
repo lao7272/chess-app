@@ -6,4 +6,40 @@
     height: 31.25rem;
     background: #ccc;
 }
+.pawn-promotion-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+}
+.hidden {
+    display: none;
+}
+.pawn-promotion-container > .pawn-promotion-body {
+    display: flex;
+    align-items: center;
+    place-content: center;
+    position: absolute;
+    top: calc(50% - 95px);
+    left: calc(50% - 250px);
+    height: 11.8rem;
+    width: 31.25rem;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.pawn-promotion-container > .pawn-promotion-body > .piece-promotion-option {
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 99%;
+}
+.pawn-promotion-container > .pawn-promotion-body > .piece-promotion-option:hover {
+    transition: all .5s;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.651);
+    cursor: pointer;
+}
+.pawn-promotion-container > .pawn-promotion-body > .piece-promotion-option > img{
+    margin: 0;
+    padding: 0;
+}
 
