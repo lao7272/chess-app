@@ -51,6 +51,9 @@ export default class Referee {
         return false;
     }
     knightLogic(initialPosition, currentPosition, boardState, team) {
+        if (currentPosition.y - initialPosition.y === 2) {
+
+        }
         for (let i = -1; i < 2; i += 2) {
             for (let j = -1; j < 2; j += 2) {
                 // TOP AND BOTTOM
@@ -98,7 +101,20 @@ export default class Referee {
         return false;
     }
     queenLogic(initialPosition, currentPosition, boardState, team) {
-        return this.bishopLogic(initialPosition, currentPosition, boardState, team) || this.rookLogic(initialPosition, currentPosition, boardState, team);
+        const isRookMove1 = initialPosition.x === currentPosition.x && initialPosition.y !== currentPosition.y;
+        const isRookMove2 = initialPosition.y === currentPosition.y && initialPosition.x !== currentPosition.x;
+        if(isRookMove1 || isRookMove2) return this.rookLogic(initialPosition, currentPosition, boardState, team);
+        return this.bishopLogic(initialPosition, currentPosition, boardState, team);
+    }
+    kingLogic(initialPosition, currentPosition, boardState, team){
+        const multiplierY = currentPosition.y > initialPosition.y ? 1 : currentPosition.y < initialPosition.y ? -1 : 0;
+        const multiplierX = currentPosition.x > initialPosition.x ? 1 : currentPosition.x < initialPosition.x ? -1 : 0;
+
+        const passedTile = {x: initialPosition.x + (1 * multiplierX), y: initialPosition.y + (1 * multiplierY)}
+        if (samePosition(passedTile, currentPosition)) {
+            if (this.tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
+        }
+        return false;
     }
     isValidMove(initialPosition, currentPosition, boardState, team, type) {
         switch (type) {
@@ -112,6 +128,8 @@ export default class Referee {
                 return this.rookLogic(initialPosition, currentPosition, boardState, team);
             case 'QUEEN':
                 return this.queenLogic(initialPosition, currentPosition, boardState, team);
+            case 'KING':
+                return this.kingLogic(initialPosition, currentPosition, boardState, team);
             default:
                 return false;
         }

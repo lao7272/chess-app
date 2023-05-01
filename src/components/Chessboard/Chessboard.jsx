@@ -34,12 +34,12 @@ const grabPiece = (e) => {
 }
 
 const movePiece = async (e) => {
-    const chessboard = chessboardRef.current
+    const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
         const minX = chessboard.offsetLeft - 15 ;
         const minY = chessboard.offsetTop - 10;
-        const maxX = chessboard.offsetWidth + 19;
-        const maxY = chessboard.offsetHeight -25;
+        const maxX = chessboard.offsetLeft + chessboard.clientWidth - 50;
+        const maxY = chessboard.offsetTop + chessboard.clientHeight - 53;
 
         const x = e.clientX - GRID_SIZE / 2;
         const y = e.clientY - GRID_SIZE / 2;
@@ -127,7 +127,7 @@ const dropPiece = (e) => {
                 setPieces(updatedPieces)
             } else {
                 // RESETS THE PIECE POSITION
-                activePiece.style.location = "relative";
+                activePiece.style.location = "absolute";
                 activePiece.style.removeProperty('top');
                 activePiece.style.removeProperty('left');
             }

@@ -1,10 +1,10 @@
-const GRID_SIZE = 62.5;
+const GRID_SIZE = 62.5; //3.90625
 
 const VERTICAL_AXIS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const HORIZONTAL_AXIS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 const samePosition = (p1, p2) => {
-    return (p1.x === p2.x && p1.y === p2.y)
+    return p1.x === p2.x && p1.y === p2.y;
 }
 
 const INITIAL_CHESSBOARD_STATE = [
