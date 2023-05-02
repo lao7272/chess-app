@@ -11,4 +11,38 @@ const kingLogic = (initialPosition, currentPosition, boardState, team) => {
     }
     return false;
 }
-export default kingLogic;
+const getPossibleKingMoves = (king, boardState) => {
+    const possibleMoves = [];
+    const x = king.position.x;
+    const y = king.position.y;
+    let passedTile = {x: x + 1, y: y + 1};
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x - 1, y: y + 1};
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x + 1, y: y - 1}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x - 1, y: y - 1}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+
+    passedTile = {x: x, y: y + 1}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x, y: y - 1}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x + 1, y: y}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    passedTile = {x: x - 1, y: y}
+    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+
+    return possibleMoves;
+}
+export {
+    kingLogic,
+    getPossibleKingMoves
+};

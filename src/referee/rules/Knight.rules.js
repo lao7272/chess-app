@@ -1,9 +1,7 @@
 import { tileIsEmptyOrCaptured } from "./General.rules";
 
 const knightLogic = (initialPosition, currentPosition, boardState, team) => {
-    if (currentPosition.y - initialPosition.y === 2) {
 
-    }
     for (let i = -1; i < 2; i += 2) {
         for (let j = -1; j < 2; j += 2) {
             // TOP AND BOTTOM
@@ -22,4 +20,24 @@ const knightLogic = (initialPosition, currentPosition, boardState, team) => {
     }
     return false;
 }
-export default knightLogic;
+const getPossibleKnightMoves = (knight, boardState) => {
+    const possibleMoves = [];
+    for (let i = -1; i < 2; i += 2) {
+        for (let j = -1; j < 2; j += 2) {
+            const verticalMove = {x: knight.position.x + j, y: knight.position.y + i * 2};
+            const horizontalMove = {x: knight.position.x + i * 2, y: knight.position.y + j};
+
+            if (tileIsEmptyOrCaptured(verticalMove, boardState, knight.team)) {
+                possibleMoves.push(verticalMove);
+            }
+            if (tileIsEmptyOrCaptured(horizontalMove, boardState, knight.team)) {
+                possibleMoves.push(horizontalMove);
+            }
+        }
+    }
+    return possibleMoves;
+}
+export {
+    knightLogic,
+    getPossibleKnightMoves
+}

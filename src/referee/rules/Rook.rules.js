@@ -17,4 +17,47 @@ const rookLogic = (initialPosition, currentPosition, boardState, team) => {
     }
     return false;
 }
-export default rookLogic;
+const getPossibleRookMoves = (rook, boardState) => {
+    const possibleMoves = [];
+    const x = rook.position.x;
+    const y = rook.position.y;
+    // TOP
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x, y: y + i};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // BOTTOM
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x, y: y - i};
+        
+        if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // RIGHT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x + i, y};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // LEFT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x - i, y};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    return possibleMoves;
+}
+export {
+rookLogic,
+getPossibleRookMoves
+}
+    

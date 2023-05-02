@@ -1,5 +1,5 @@
-import bishopLogic from "./Bishop.rules";
-import rookLogic from "./Rook.rules";
+import {bishopLogic, getPossibleBishopMoves} from "./Bishop.rules";
+import {rookLogic, getPossibleRookMoves} from "./Rook.rules";
 
 const queenLogic = (initialPosition, currentPosition, boardState, team) => {
     const isRookMove1 = initialPosition.x === currentPosition.x && initialPosition.y !== currentPosition.y;
@@ -7,5 +7,12 @@ const queenLogic = (initialPosition, currentPosition, boardState, team) => {
     if(isRookMove1 || isRookMove2) return rookLogic(initialPosition, currentPosition, boardState, team);
     return bishopLogic(initialPosition, currentPosition, boardState, team);
 }
-
-export default queenLogic;
+const getPossibleQueenMoves = (queen, boardState) => {
+    const bishopMoves = getPossibleBishopMoves(queen, boardState);
+    const rookMoves = getPossibleRookMoves(queen, boardState);
+    return [...bishopMoves, ...rookMoves];
+}
+export {
+    queenLogic,
+    getPossibleQueenMoves,
+}

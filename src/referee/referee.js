@@ -5,7 +5,13 @@ import {
     queenLogic,
     knightLogic,
     bishopLogic,
-    rookLogic
+    rookLogic,
+    getPossiblePawnMoves,
+    getPossibleKnightMoves,
+    getPossibleBishopMoves,
+    getPossibleRookMoves,
+    getPossibleQueenMoves,
+    getPossibleKingMoves
 } from "./rules";
 
 
@@ -20,7 +26,6 @@ export default class Referee {
                 }) && p.enPassant === true);
                 if (piece) return true;
             }
-
         }
         return false;
     }
@@ -40,6 +45,24 @@ export default class Referee {
                 return kingLogic(initialPosition, currentPosition, boardState, team);
             default:
                 return false;
+        }
+    }
+    getValidMoves(piece, boardState) {
+        switch (piece.type) {
+            case 'PAWN':
+                return getPossiblePawnMoves(piece, boardState);
+            case 'KNIGHT':
+                return getPossibleKnightMoves(piece, boardState);
+            case 'BISHOP':
+                return getPossibleBishopMoves(piece, boardState);
+            case 'ROOK':
+                return getPossibleRookMoves(piece, boardState);
+            case 'QUEEN':
+                return getPossibleQueenMoves(piece, boardState);
+            case 'KING':
+                return getPossibleKingMoves(piece, boardState);
+            default:
+                return [];
         }
     }
 }

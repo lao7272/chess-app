@@ -15,8 +15,16 @@ export default function Chessboard() {
     const promoteRef = useRef(null);
     let board = [];
 
-
+const updateValidMoves = () => {
+    setPieces((pieces) => {
+        return pieces.map(p => {
+            p.possibleMoves = referee.getValidMoves(p, pieces);
+            return p;
+        })
+    })
+}
 const grabPiece = (e) => {
+    updateValidMoves();
     const element = e.target;
     const chessboard = chessboardRef.current;
     if (element.classList.contains("chess-piece") && chessboard){
@@ -98,7 +106,7 @@ const dropPiece = (e) => {
                         piece.enPassant = false;
                         piece.position.x = x;
                         piece.position.y = y;
-                        result.push(piece)
+                        result.push(piece);
                     } else if (!samePosition(piece.position, {x, y: y - pawnDirection})) {
                         if(piece.type === "PAWN") {
                             piece.enPassant = false;
@@ -144,7 +152,7 @@ const dropPiece = (e) => {
     }
 }
 
-function promotePawn (type) {
+const promotePawn = (type) => {
     if (!pawnPromotion) return;
     let imageType = '';
     switch (type) {
@@ -176,7 +184,7 @@ function promotePawn (type) {
     setPieces(updatedPieces);
 }
 
-function setPromotionTeam () {
+const setPromotionTeam = () => {
     if (!pawnPromotion) return "white";
     return pawnPromotion.team === "white" ? "white" : "black";
 }
@@ -186,7 +194,10 @@ function setPromotionTeam () {
             const number = i + j;
             const piece = pieces.find(p => samePosition(p.position, {x: i, y: j}));
             const image = piece ? piece.image : undefined;
-            board.push(<Tile key={`${j}${i}`} number={number} image={image}/>);
+            let currentPiece = pieces.find(p => samePosition(p.position, grabPosition));
+            let highlight;
+            if(currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => samePosition(p, {x: i, y: j})) : false;
+            board.push(<Tile key={`${j}${i}`} number={number} image={image} highlight={highlight}/>);
         }
     }
     return (

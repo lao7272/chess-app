@@ -5,17 +5,17 @@
     place-content: center;
 }
 
-.Tile .chess-piece{
+.tile .chess-piece{
     width: 62.5px;
     height: 62.5px;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 60px;
 }
-.Tile .chess-piece:hover{
+.tile .chess-piece:hover{
     cursor: grab;
 }
-.Tile .chess-piece:active{
+.tile .chess-piece:active{
     cursor: grabbing;
 }
 .black-tile {
@@ -23,4 +23,11 @@
 }
 .white-tile {
     background-color: #FFCD9D;
+}
+.highlighted-tile::before {
+    content: ' ';
+    width: 18px;
+    height: 18px;
+    border-radius: 99%;
+    background-color: rgba(0, 0, 0, 0.5);
 }

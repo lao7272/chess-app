@@ -14,4 +14,47 @@ const bishopLogic = (initialPosition, currentPosition, boardState, team) => {
     }
     return false;
 }
-export default bishopLogic;
+
+const getPossibleBishopMoves = (bishop, boardState) => {
+    const possibleMoves = [];
+    const x = bishop.position.x;
+    const y = bishop.position.y;
+    // UPPER RIGHT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x + i, y: y + i};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, bishop.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // UPPER LEFT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x - i, y: y + i};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, bishop.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // BOTTOM RIGHT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x + i, y: y - i};
+        
+        if (tileIsEmptyOrCaptured(passedTile, boardState, bishop.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    // BOTTOM LEFT
+    for (let i = 1; i < 8; i++) {
+        let passedTile = {x: x - i, y: y - i};
+        if (tileIsEmptyOrCaptured(passedTile, boardState, bishop.team)) {
+            possibleMoves.push(passedTile)
+        };
+        if (tileIsOccupied(passedTile, boardState)) break;
+    }
+    return possibleMoves;
+}
+export {
+    bishopLogic,
+    getPossibleBishopMoves
+}
