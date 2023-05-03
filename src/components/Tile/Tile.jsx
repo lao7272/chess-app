@@ -6,7 +6,8 @@ export default function ({number, image, highlight}) {
         'tile', 
         number % 2 === 0 && "black-tile", 
         number % 2 !== 0 && "white-tile", 
-        highlight && "highlighted-tile"
+        highlight && "highlighted-tile",
+        image && "chess-piece-tile"
     ].filter(Boolean).join(' ');
     return (
         <div className={className}>
@@ -14,4 +15,4 @@ export default function ({number, image, highlight}) {
         </div>
     )    
 
-}
+} 

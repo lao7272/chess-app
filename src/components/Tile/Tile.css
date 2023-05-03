@@ -1,8 +1,9 @@
 .tile {
-    display: grid;
+    display: flex;
     width: 62.5px;
     height: 62.5px;
-    place-content: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .tile .chess-piece{
@@ -24,10 +25,18 @@
 .white-tile {
     background-color: #FFCD9D;
 }
-.highlighted-tile::before {
+.highlighted-tile:not(.chess-piece-tile)::before {
     content: ' ';
     width: 18px;
     height: 18px;
     border-radius: 99%;
     background-color: rgba(0, 0, 0, 0.5);
+}
+.highlighted-tile.chess-piece-tile::before {
+    position: absolute;
+    content: ' ';
+    width: 53.5px;
+    height: 53.5px;
+    border: 4px solid rgba(0, 0, 0, 0.4);
+    border-radius: 99%;
 }
