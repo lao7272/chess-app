@@ -1,11 +1,10 @@
-import { samePosition } from "../../Constants";
 const tileIsOccupied = (currentPosition, boardState) => {
-    const piece = boardState.find(p => samePosition(p.position, currentPosition));
+    const piece = boardState.find(p => p.samePosition(currentPosition));
     if (piece) return true;
     return false;
 }
 const pieceIsCaptured =(currentPosition, boardState, team) => {
-    const piece = boardState.find(p => samePosition(p.position, currentPosition) && p.team !== team);
+    const piece = boardState.find(p => p.samePosition(currentPosition) && p.team !== team);
     if (piece) return true;
     return false;
 }

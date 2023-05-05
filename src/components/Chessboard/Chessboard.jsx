@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import './Chessboard.css';
 import Tile from '../Tile/Tile';
-import { VERTICAL_AXIS, HORIZONTAL_AXIS, GRID_SIZE, samePosition } from '../../Constants';
+import { VERTICAL_AXIS, HORIZONTAL_AXIS, GRID_SIZE } from '../../Constants';
 
 export default function Chessboard({ playMove, pieces }) {
     const [activePiece, setActivePiece] = useState(null);
@@ -67,7 +67,7 @@ export default function Chessboard({ playMove, pieces }) {
             const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
             const y = Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 500) / GRID_SIZE));
 
-            const currentPiece = pieces.find(p => samePosition(p.position, grabPosition));
+            const currentPiece = pieces.find(p => p.samePosition(grabPosition));
 
             if (currentPiece) {
                 const isValidMove = playMove(grabPosition, { x, y }, currentPiece);
@@ -86,11 +86,11 @@ export default function Chessboard({ playMove, pieces }) {
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
         for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
             const number = i + j;
-            const piece = pieces.find(p => samePosition(p.position, { x: i, y: j }));
+            const piece = pieces.find(p => p.samePosition({ x: i, y: j }));
             const image = piece ? piece.image : undefined;
-            let currentPiece = pieces.find(p => samePosition(p.position, grabPosition));
+            const currentPiece = pieces.find(p => p.samePosition(grabPosition));
             let highlight;
-            if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => samePosition(p, { x: i, y: j })) : false;
+            if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => p.samePosition({ x: i, y: j })) : false;
             board.push(<Tile key={`${j}${i}`} number={number} image={image} highlight={highlight} />);
         }
     }

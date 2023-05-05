@@ -1,4 +1,4 @@
-import { samePosition } from "../../Constants";
+import { Position } from "../../models";
 import { tileIsEmptyOrCaptured, tileIsOccupied } from "./General.rules";
 
 
@@ -8,8 +8,8 @@ const rookLogic = (initialPosition, currentPosition, boardState, team) => {
         const multiplierY = currentPosition.y > initialPosition.y ? 1 : -1;
         const x = currentPosition.y === initialPosition.y ? initialPosition.x + i * multiplierX : initialPosition.x;
         const y = currentPosition.x === initialPosition.x ? initialPosition.y + i * multiplierY : initialPosition.y;
-        const passedTile = {x, y};
-        if (samePosition(passedTile, currentPosition)) {
+        const passedTile = new Position(x, y);
+        if (passedTile.samePosition(currentPosition)) {
             if (tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
         } else {
             if (tileIsOccupied(passedTile, boardState)) break;
@@ -23,7 +23,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     const y = rook.position.y;
     // TOP
     for (let i = 1; i < 8; i++) {
-        let passedTile = {x, y: y + i};
+        let passedTile = new Position(x, y + i);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
         };
@@ -31,7 +31,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // BOTTOM
     for (let i = 1; i < 8; i++) {
-        let passedTile = {x, y: y - i};
+        let passedTile = new Position(x, y - i);
         
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
@@ -40,7 +40,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // RIGHT
     for (let i = 1; i < 8; i++) {
-        let passedTile = {x: x + i, y};
+        let passedTile = new Position(x + i, y);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
         };
@@ -48,7 +48,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // LEFT
     for (let i = 1; i < 8; i++) {
-        let passedTile = {x: x - i, y};
+        let passedTile = new Position(x - i, y);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
         };
