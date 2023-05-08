@@ -1,11 +1,11 @@
-import {Pawn, Piece, Position} from "./models";
+import {Pawn, Piece, Position, Chessboard} from "./models";
 
 const GRID_SIZE = 62.5; 
 
 const VERTICAL_AXIS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const HORIZONTAL_AXIS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
-const INITIAL_CHESSBOARD_STATE = [
+const initialChessboard = new Chessboard([
     new Piece(new Position (0, 7), "black", "rook"),
     new Piece(new Position (7, 7), "black", "rook"),
     new Piece(new Position (1, 7), "black", "knight"),
@@ -38,11 +38,11 @@ const INITIAL_CHESSBOARD_STATE = [
     new Pawn(new Position (5, 1), "white"),
     new Pawn(new Position (6, 1), "white"),
     new Pawn(new Position (7, 1), "white")
-];
+]);
 
 export {
     HORIZONTAL_AXIS,
     VERTICAL_AXIS, 
-    INITIAL_CHESSBOARD_STATE,
+    initialChessboard,
     GRID_SIZE
 }

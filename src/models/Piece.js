@@ -1,8 +1,9 @@
 
 export default class Piece{
-    constructor (position, team, type) {
+    constructor (position, team, type, possibleMoves = []) {
         this.image = `./assets/images/${team}-${type}.png`;
         this.position = position;
+        this.possibleMoves = possibleMoves;
         this.team = team;
         this.type = type;
     }
@@ -26,5 +27,8 @@ export default class Piece{
     }
     samePosition(desiredPostion){
         return this.position.samePosition(desiredPostion);
+    }
+    clone(){
+        return new Piece(this.position.clone(), this.team, this.type, this.possibleMoves.map(move => move.clone()))
     }
 }

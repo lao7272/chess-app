@@ -6,4 +6,7 @@ export default class Position {
     samePosition({x, y}){
         return x === this.x && y === this.y;
     }
+    clone() {
+        return new Position(this.x, this.y);
+    }
 }

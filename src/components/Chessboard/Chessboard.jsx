@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import './Chessboard.css';
 import Tile from '../Tile/Tile';
 import { VERTICAL_AXIS, HORIZONTAL_AXIS, GRID_SIZE } from '../../Constants';
+import { Position } from '../../models';
 
 export default function Chessboard({ playMove, pieces }) {
     const [activePiece, setActivePiece] = useState(null);
@@ -70,7 +71,7 @@ export default function Chessboard({ playMove, pieces }) {
             const currentPiece = pieces.find(p => p.samePosition(grabPosition));
 
             if (currentPiece) {
-                const isValidMove = playMove(grabPosition, { x, y }, currentPiece);
+                const isValidMove = playMove(currentPiece.clone(), new Position(x, y)); 
                 if (!isValidMove) {
                     // RESETS THE PIECE POSITION
                     activePiece.style.location = "relative";
