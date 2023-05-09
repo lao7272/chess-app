@@ -7,53 +7,45 @@ import {
     getPossibleRookMoves 
 } from "../referee/rules";
 export default class Chessboard {
-    constructor (pieces) {
-        this.pieces = pieces
+    constructor (pieces, totalTurns = 0) {
+        this.pieces = pieces;
+        this.totalTurns = totalTurns;
+    }
+    get getCurrentTeam(){
+        return this.totalTurns % 2 === 0 ? "black" : "white";
     }
     getPossibleMoves(){
         for (const piece of this.pieces) {
-            piece.possibleMoves = this.getValidMoves(piece);
+            if (piece.team === this.getCurrentTeam) {
+                piece.possibleMoves = this.getValidMoves(piece);
+            } else {
+                piece.possibleMoves = [];
+            }
         }
-        this.getCheckMoves()
+        // Checks the current team valid moves
+        this.getTeamDangerousMoves();
     }
-    getCheckMoves () {
-        const king = this.pieces.find(p => p.isKing && p.team === "black");
-
-        if(!king)return;
-        
-        // KING MOVE RESTRICTIONS
-        
-        for (const move of king.possibleMoves) {
-            // CREATES A CLONE OF THE BOARD TO SIMULATE THE KING MOVES
-            const clonedBoard = this.clone();
-            const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !==  king.team);
-            const clonedKing = clonedBoard.pieces.find(p => p.isKing && p.team === king.team);
-            if(clonedBoard.pieces.find(p => p.samePosition(move))) {
+    
+    getTeamDangerousMoves(){
+        for (const piece of this.pieces.filter(p => p.team === this.getCurrentTeam)) {
+            for (const move of piece.possibleMoves) {
+                const clonedBoard = this.clone();
                 clonedBoard.pieces = clonedBoard.pieces.filter(p => !p.samePosition(move))
-            }
-            
-            clonedKing.position = move;
-            for(const enemy of filterTeamPieces){
-                const newEnemy = this.pieces.find(p => p.samePosition(enemy.position) && p.team !== king.team);
-                enemy.possibleMoves = clonedBoard.getValidMoves(newEnemy)
-            }
-            let safePosition = true; 
+                const clonedPiece = clonedBoard.pieces.find(p => p.samePosition(piece.position));
+                clonedPiece.position = move.clone();
+                const clonedKing  = clonedBoard.pieces.find(p => p.isKing && p.team === clonedBoard.getCurrentTeam);
+                const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !==  clonedBoard.getCurrentTeam);
 
-            for(const piece of clonedBoard.pieces){
-                if (piece.team === king.team) continue;
-                if(piece.isPawn) {
-                    const possiblePawnMoves = clonedBoard.getValidMoves(piece);
-                    
-                    if (possiblePawnMoves.some(position => position.x !== piece.position.x &&  position.samePosition(move))) {
-                        safePosition = false;
-                    };
-                } else if (piece.possibleMoves.some(position => position.samePosition(move))) {
-                    safePosition = false;
-                } 
-            } 
-
-            if(!safePosition){
-                king.possibleMoves = king.possibleMoves.filter(m => !m.samePosition(move));
+                for(const enemy of filterTeamPieces){
+                    const newEnemy = clonedBoard.pieces.find(p => p.samePosition(enemy.position) && p.team !== clonedBoard.getCurrentTeam);
+                    enemy.possibleMoves = clonedBoard.getValidMoves(newEnemy);
+                    if (enemy.isPawn){
+                        const isDangerousMove = enemy.possibleMoves.some(m => m.x !== enemy.position.x && m.samePosition(clonedKing.position));
+                        if(isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
+                    } else {
+                        if(enemy.possibleMoves.some(m => m.samePosition(clonedKing.position))) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
+                    }
+                }
             }
         }
     }
@@ -117,6 +109,6 @@ export default class Chessboard {
     }
 
     clone(){
-        return new Chessboard(this.pieces.map(piece => piece.clone()));
+        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns);
     }
 } 

@@ -38,7 +38,7 @@ const initialChessboard = new Chessboard([
     new Pawn(new Position (5, 1), "white"),
     new Pawn(new Position (6, 1), "white"),
     new Pawn(new Position (7, 1), "white")
-]);
+], 1);
 
 export {
     HORIZONTAL_AXIS,

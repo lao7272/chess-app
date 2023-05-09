@@ -17,26 +17,24 @@ export default function Referee() {
 
     const promoteRef = useRef(null);
 
-
     useEffect(() => {
-        updatePossibleMoves();
-    }, []);
-    const updatePossibleMoves = () => {
         chessboard.getPossibleMoves();
-    }
+    }, []);
 
     const playMove = (currentPiece, desiredPosition) => {
-        const possibleMoves = chessboard.getValidMoves(currentPiece);
-        if (!possibleMoves) return false;
+        if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
+        if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
         const validMove = currentPiece.possibleMoves.some(move => move.samePosition(desiredPosition));
         if (!validMove) return false;
         const isEnPassant = isEnPassantCapture(currentPiece.position, desiredPosition, currentPiece.team, currentPiece.type);
 
         // playmove modifies the board, therefore, the chessboard is updated
         setChessboard((prevChessboard) => {
+            const clonedChessboard = chessboard.clone();
+            clonedChessboard.totalTurns++;
             // MOVE LOGIC
-            chessboard.playMove(currentPiece, desiredPosition, isEnPassant, validMove); 
-            return chessboard.clone();
+            clonedChessboard.playMove(currentPiece, desiredPosition, isEnPassant, validMove); 
+            return clonedChessboard;
         });
         // PAWN PROMOTION
         const promotion = currentPiece.team === "white" ? 7 : 0;
@@ -99,7 +97,7 @@ export default function Referee() {
 
             return clonedChessboard;
         });
-        updatePossibleMoves();
+        chessboard.getPossibleMoves();
     }
 
     const setPromotionTeam = () => {
@@ -108,6 +106,9 @@ export default function Referee() {
     }
     return (
         <>
+            <div style={{color: "white", display:"flex", margin: "10px 10px 10px 0px", fontSize: "24px"}}>
+                Total Moves:<div style={{marginLeft: "10px"}}> {chessboard.totalTurns}</div>
+            </div>
             <div className='pawn-promotion-container hidden' ref={promoteRef}>
                 <div className='pawn-promotion-body'>
                     <div onClick={() => promotePawn("queen")} className='piece-promotion-option'><img src={`../assets/images/${setPromotionTeam()}-queen.png`} alt="Queen" /></div>
