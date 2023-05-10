@@ -43,7 +43,37 @@ const getPossibleKingMoves = (king, boardState) => {
 
     return possibleMoves;
 }
+const castling = (king, boardState) => {
+    const possibleMoves = [];
+    if (king.hasMoved) return possibleMoves;
+    const rooks = boardState.filter(p => p.isRook && p.team === king.team && !p.hasMoved)
+    for (const rook of rooks) {
+        const direction = rook.position.x - king.position.x > 0 ? 1 : -1;
+        const adjacentPosition = king.position.clone();
+        adjacentPosition.x += direction;
+
+        if(!rook.possibleMoves.some(m => m.samePosition(adjacentPosition))) continue;
+
+        const castlingSquares = rook.possibleMoves.filter(m => m.y === king.position.y);
+
+        let valid = true;
+        const enemies = boardState.filter(p => p.team !== king.team);
+        for (const enemy of enemies) {
+            if(!enemy.possibleMoves) continue;
+            for (const move of enemy.possibleMoves){
+                if(castlingSquares.some(s => s.samePosition(move))) valid = false;
+                if(!valid) break;
+            }
+            if(!valid) break;
+        }
+        if (!valid) continue;
+        adjacentPosition.x += direction;
+        possibleMoves.push(adjacentPosition);
+    }
+    return possibleMoves;
+}
 export {
     kingLogic,
-    getPossibleKingMoves
+    getPossibleKingMoves,
+    castling
 };

@@ -1,14 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ChessBoard from '../Chessboard/Chessboard'
 import { initialChessboard } from '../../Constants';
-import {
-    bishopLogic,
-    kingLogic,
-    knightLogic,
-    pawnLogic,
-    queenLogic,
-    rookLogic
-} from '../../referee/rules';
 import { Piece } from '../../models';
 
 export default function Referee() {
@@ -29,7 +21,7 @@ export default function Referee() {
         const isEnPassant = isEnPassantCapture(currentPiece.position, desiredPosition, currentPiece.team, currentPiece.type);
 
         // playmove modifies the board, therefore, the chessboard is updated
-        setChessboard((prevChessboard) => {
+        setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
@@ -44,29 +36,10 @@ export default function Referee() {
             setpawnPromotion(prevPromotionPawn => {
                 const clonedCurrentPiece = currentPiece.clone()
                 clonedCurrentPiece.position = desiredPosition.clone();
-                return prevPromotionPawn =  clonedCurrentPiece.clone();
+                return prevPromotionPawn =  clonedCurrentPiece;
             });
         }
-    }
-    const isValidMove = (initialPosition, currentPosition, team, type) => {
-        switch (type) {
-            case 'pawn':
-                return pawnLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            case 'knight':
-                return knightLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            case 'bishop':
-                return bishopLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            case 'rook':
-                return rookLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            case 'queen':
-                return queenLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            case 'king':
-                return kingLogic(initialPosition, currentPosition, chessboard.pieces, team);
-            default:
-                return false;
-        }
-    }
-    
+    }    
     const isEnPassantCapture = (initialPosition, currentPosition, team, type) => {
         const pawnDirection = team === 'white' ? 1 : -1;
         if (type === 'pawn') {
@@ -83,11 +56,11 @@ export default function Referee() {
     const promotePawn = (type) => {
         if (!pawnPromotion) return;
         promoteRef.current.classList.add('hidden');
-        setChessboard((prevChessboard) => {
+        setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.pieces = clonedChessboard.pieces.reduce((result, piece) => {
                 if (piece.samePosition(pawnPromotion.position)) { 
-                    result.push(new Piece(piece.position.clone(), piece.team, type));
+                    result.push(new Piece(piece.position.clone(), piece.team, type, true));
                 } else {
                     result.push(piece);
                 }

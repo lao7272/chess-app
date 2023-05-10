@@ -23,6 +23,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     const y = rook.position.y;
     // TOP
     for (let i = 1; i < 8; i++) {
+        if(y + i > 7) break;
         let passedTile = new Position(x, y + i);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
@@ -31,6 +32,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // BOTTOM
     for (let i = 1; i < 8; i++) {
+        if(y - i < 0) break;
         let passedTile = new Position(x, y - i);
         
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
@@ -40,6 +42,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // RIGHT
     for (let i = 1; i < 8; i++) {
+        if(x + i > 7) break;
         let passedTile = new Position(x + i, y);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)
@@ -48,6 +51,7 @@ const getPossibleRookMoves = (rook, boardState) => {
     }
     // LEFT
     for (let i = 1; i < 8; i++) {
+        if(x - i < 0) break;
         let passedTile = new Position(x - i, y);
         if (tileIsEmptyOrCaptured(passedTile, boardState, rook.team)) {
             possibleMoves.push(passedTile)

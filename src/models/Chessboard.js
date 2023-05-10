@@ -4,7 +4,8 @@ import {
     getPossibleKnightMoves, 
     getPossiblePawnMoves, 
     getPossibleQueenMoves, 
-    getPossibleRookMoves 
+    getPossibleRookMoves,
+    castling
 } from "../referee/rules";
 export default class Chessboard {
     constructor (pieces, totalTurns = 0) {
@@ -16,14 +17,18 @@ export default class Chessboard {
     }
     getPossibleMoves(){
         for (const piece of this.pieces) {
-            if (piece.team === this.getCurrentTeam) {
-                piece.possibleMoves = this.getValidMoves(piece);
-            } else {
+            piece.possibleMoves = this.getValidMoves(piece);
+        }
+        const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam)
+        // Castling
+        king.possibleMoves = [...king.possibleMoves, ...castling(king, this.pieces)]
+        // Checks the current team valid moves
+        this.getTeamDangerousMoves();
+        for (const piece of this.pieces) {
+            if (piece.team !== this.getCurrentTeam) {
                 piece.possibleMoves = [];
             }
         }
-        // Checks the current team valid moves
-        this.getTeamDangerousMoves();
     }
     
     getTeamDangerousMoves(){
@@ -71,12 +76,30 @@ export default class Chessboard {
         const { x, y } = desiredPosition;
 
         const pawnDirection = currentPiece.team === 'white' ? 1 : -1;
-        if (isEnPassant) {
+        
+        if(currentPiece.isKing && (currentPiece.position.x - desiredPosition.x === 2 || currentPiece.position.x - desiredPosition.x === -2)){
+            const xPosition = currentPiece.position.x - desiredPosition.x === 2 ? 0 : 7;
+            const yPosition = currentPiece.team === "white" ? 0 : 7;
+            const rook = this.pieces.find(p => p.isRook && p.position.x === xPosition && p.position.y === yPosition);
+            if (rook) {
+                this.pieces = this.pieces.map(p => {
+                    if (p.samePosition(currentPiece.position)) {
+                        p.position.x = desiredPosition.x;
+                    } if (p.samePosition(rook.position)) {
+                        const direction = xPosition === 0 ? -1 : 1;
+                        p.position.x = desiredPosition.x - direction;
+                    }
+                    return p;
+                })
+            }
+            this.getPossibleMoves();
+        } else if (isEnPassant) {
             this.pieces = this.pieces.reduce((result, piece) => {
                 if (piece.samePosition(currentPiece.position)) {
                     if (piece.isPawn) piece.enPassant = false;
                     piece.position.x = x;
                     piece.position.y = y;
+                    piece.hasMoved = true;
                     result.push(piece);
                 } else if (!piece.samePosition({x, y: y - pawnDirection})) {
                     if (piece.isPawn) piece.enPassant = false;
@@ -93,7 +116,7 @@ export default class Chessboard {
                     if (piece.isPawn) piece.enPassant = Math.abs(currentPiece.position.y - y) === 2;
                     piece.position.x = x;
                     piece.position.y = y;
-                    
+                    piece.hasMoved = true;
                     result.push(piece);
                 } else if (!piece.samePosition({x, y})) {
                     if (piece.isPawn) piece.enPassant = false;

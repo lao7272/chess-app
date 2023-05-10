@@ -1,5 +1,5 @@
 import {pawnLogic, getPossiblePawnMoves} from "./Pawn.rules";
-import {kingLogic, getPossibleKingMoves} from "./King.rules";
+import {kingLogic, getPossibleKingMoves, castling} from "./King.rules";
 import {queenLogic, getPossibleQueenMoves} from "./Queen.rules";
 import {knightLogic, getPossibleKnightMoves} from "./Knight.rules";
 import {bishopLogic, getPossibleBishopMoves} from "./Bishop.rules";
@@ -17,5 +17,6 @@ export {
     getPossibleBishopMoves,
     getPossibleRookMoves,
     getPossibleQueenMoves,
-    getPossibleKingMoves
+    getPossibleKingMoves,
+    castling
 }
