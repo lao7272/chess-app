@@ -1,17 +1,6 @@
 import { Position } from "../../models";
 import { tileIsEmptyOrCaptured } from "./General.rules";
 
-
-const kingLogic = (initialPosition, currentPosition, boardState, team) => {
-    const multiplierY = currentPosition.y > initialPosition.y ? 1 : currentPosition.y < initialPosition.y ? -1 : 0;
-    const multiplierX = currentPosition.x > initialPosition.x ? 1 : currentPosition.x < initialPosition.x ? -1 : 0;
-
-    const passedTile = new Position(initialPosition.x + (1 * multiplierX), initialPosition.y + (1 * multiplierY));
-    if (passedTile.samePosition(currentPosition)) {
-        if (tileIsEmptyOrCaptured(currentPosition, boardState, team)) return true;
-    }
-    return false;
-}
 const getPossibleKingMoves = (king, boardState) => {
     const possibleMoves = [];
     const x = king.position.x;
@@ -82,7 +71,6 @@ const castling = (king, boardState) => {
     return possibleMoves;
 }
 export {
-    kingLogic,
     getPossibleKingMoves,
     castling
 };

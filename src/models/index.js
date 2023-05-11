@@ -1,6 +1,6 @@
 import Position from "./Positition";
 import Piece from "./Piece";
-import Pawn from "./Pawn";
+import Pawn from "./pieces/Pawn";
 import Chessboard from "./Chessboard";
 export {
     Position,

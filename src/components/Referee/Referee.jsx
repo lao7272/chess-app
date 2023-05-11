@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import ChessBoard from '../Chessboard/Chessboard'
+import React, { useRef, useState } from 'react';
+import ChessBoard from '../Chessboard/Chessboard';
 import { initialChessboard } from '../../Constants';
 import { Piece } from '../../models';
+import './Referee.css';
 
 export default function Referee() {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
@@ -17,7 +18,7 @@ export default function Referee() {
         if (!validMove) return false;
         const isEnPassant = isEnPassantCapture(currentPiece.position, desiredPosition, currentPiece.team, currentPiece.type);
 
-        // playmove modifies the board, therefore, the chessboard is updated
+        // Playmove modifies the board, therefore, the chessboard is updated
         setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.totalTurns++;
@@ -102,7 +103,11 @@ export default function Referee() {
                     </div>
                 </div>
             </div>
-            <ChessBoard playMove={playMove} pieces={chessboard.pieces} />
+            <div className='chessboard-container'>
+                <div className='number-index'></div>
+                <ChessBoard playMove={playMove} pieces={chessboard.pieces}/>
+                <div className='letter-index'></div>
+            </div>
         </>
     )
 }

@@ -8,10 +8,11 @@ import {
     castling
 } from "../referee/rules";
 export default class Chessboard {
-    constructor (pieces, totalTurns = 0) {
+    constructor (pieces, totalTurns = 0, playHistory = []) {
         this.pieces = pieces;
         this.totalTurns = totalTurns;
         this.winningTeam = null;
+        this.playHistory = playHistory;
     }
     get getCurrentTeam(){
         return this.totalTurns % 2 === 0 ? "black" : "white";
@@ -87,14 +88,17 @@ export default class Chessboard {
             const yPosition = currentPiece.team === "white" ? 0 : 7;
             const rook = this.pieces.find(p => p.isRook && p.position.x === xPosition && p.position.y === yPosition);
             if (rook) {
-                this.pieces = this.pieces.map(p => {
-                    if (p.samePosition(currentPiece.position)) {
-                        p.position.x = desiredPosition.x;
-                    } if (p.samePosition(rook.position)) {
+                this.pieces = this.pieces.map(piece => {
+                    if (piece.samePosition(currentPiece.position)) {
+                        piece.position.x = desiredPosition.x;
+                        this.playHistory.push(piece.position);
+                    } if (piece.samePosition(rook.position)) {
                         const direction = xPosition === 0 ? -1 : 1;
-                        p.position.x = desiredPosition.x - direction;
+                        piece.position.x = desiredPosition.x - direction;
+
+                        this.playHistory.push(piece.position);
                     }
-                    return p;
+                    return piece;
                 })
             }
             this.getPossibleMoves();
@@ -106,6 +110,8 @@ export default class Chessboard {
                     piece.position.y = y;
                     piece.hasMoved = true;
                     result.push(piece);
+
+                    this.playHistory.push(piece.position);
                 } else if (!piece.samePosition({x, y: y - pawnDirection})) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
@@ -123,6 +129,8 @@ export default class Chessboard {
                     piece.position.y = y;
                     piece.hasMoved = true;
                     result.push(piece);
+
+                    this.playHistory.push(piece.position);
                 } else if (!piece.samePosition({x, y})) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
@@ -137,6 +145,6 @@ export default class Chessboard {
     }
 
     clone(){
-        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns);
+        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.playHistory);
     }
 } 

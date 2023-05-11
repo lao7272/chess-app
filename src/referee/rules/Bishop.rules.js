@@ -1,20 +1,6 @@
 import {Position} from "../../models/";
 import { tileIsEmptyOrCaptured, tileIsOccupied } from "./General.rules";
 
-const bishopLogic = (initialPosition, currentPosition, boardState, team) => {
-    for (let i = 1; i < 8; i++) {
-        const x = currentPosition.x > initialPosition.x ? initialPosition.x + i : initialPosition.x - i;
-        const y = currentPosition.y > initialPosition.y ? initialPosition.y + i : initialPosition.y - i;
-        let passedTile = new Position(x, y);
-        if (passedTile.samePosition(currentPosition)) {
-            if (tileIsEmptyOrCaptured(passedTile, boardState, team)) return true;
-        } else {
-            if (tileIsOccupied(passedTile, boardState)) break;
-        }
-    }
-    return false;
-}
-
 const getPossibleBishopMoves = (bishop, boardState) => {
     const possibleMoves = [];
     const x = bishop.position.x;
@@ -58,7 +44,4 @@ const getPossibleBishopMoves = (bishop, boardState) => {
     }
     return possibleMoves;
 }
-export {
-    bishopLogic,
-    getPossibleBishopMoves
-}
+export default getPossibleBishopMoves;
