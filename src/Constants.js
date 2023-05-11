@@ -39,7 +39,7 @@ const initialChessboard = new Chessboard([
     new Pawn(new Position (6, 1), "white", false),
     new Pawn(new Position (7, 1), "white", false)
 ], 1);
-
+initialChessboard.getPossibleMoves()
 export {
     HORIZONTAL_AXIS,
     VERTICAL_AXIS, 

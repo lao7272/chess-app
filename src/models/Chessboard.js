@@ -11,6 +11,7 @@ export default class Chessboard {
     constructor (pieces, totalTurns = 0) {
         this.pieces = pieces;
         this.totalTurns = totalTurns;
+        this.winningTeam = null;
     }
     get getCurrentTeam(){
         return this.totalTurns % 2 === 0 ? "black" : "white";
@@ -19,16 +20,20 @@ export default class Chessboard {
         for (const piece of this.pieces) {
             piece.possibleMoves = this.getValidMoves(piece);
         }
-        const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam)
+        const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam);
         // Castling
-        king.possibleMoves = [...king.possibleMoves, ...castling(king, this.pieces)]
+        king.possibleMoves = [...king.possibleMoves, ...castling(king, this.pieces)];
         // Checks the current team valid moves
         this.getTeamDangerousMoves();
+
         for (const piece of this.pieces) {
             if (piece.team !== this.getCurrentTeam) {
                 piece.possibleMoves = [];
             }
         }
+        const getTeamPieces = this.pieces.filter(p => p.team === this.getCurrentTeam);
+        if(getTeamPieces.some(p => p.possibleMoves.length > 0 )) return;
+        this.winningTeam = this.getCurrentTeam === 'white' ? "black" : "white";
     }
     
     getTeamDangerousMoves(){

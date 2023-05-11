@@ -4,14 +4,11 @@ import { initialChessboard } from '../../Constants';
 import { Piece } from '../../models';
 
 export default function Referee() {
-    const [chessboard, setChessboard] = useState(initialChessboard);
+    const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
 
     const promoteRef = useRef(null);
-
-    useEffect(() => {
-        chessboard.getPossibleMoves();
-    }, []);
+    const checkmateRef = useRef(null);
 
     const playMove = (currentPiece, desiredPosition) => {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
@@ -26,6 +23,9 @@ export default function Referee() {
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
             clonedChessboard.playMove(currentPiece, desiredPosition, isEnPassant, validMove); 
+            if (clonedChessboard.winningTeam) {
+                checkmateRef.current.classList.remove("hidden");
+            }
             return clonedChessboard;
         });
         // PAWN PROMOTION
@@ -77,17 +77,29 @@ export default function Referee() {
         if (!pawnPromotion) return "white";
         return pawnPromotion.team === "white" ? "white" : "black";
     }
+    const restartGame = () => {
+        checkmateRef.current.classList.add("hidden");
+        setChessboard(initialChessboard.clone());
+    }
     return (
         <>
             <div style={{color: "white", display:"flex", margin: "10px 10px 10px 0px", fontSize: "24px"}}>
                 Total Moves:<div style={{marginLeft: "10px"}}> {chessboard.totalTurns}</div>
             </div>
-            <div className='pawn-promotion-container hidden' ref={promoteRef}>
-                <div className='pawn-promotion-body'>
+            <div className='card hidden' ref={promoteRef}>
+                <div className='card-body'>
                     <div onClick={() => promotePawn("queen")} className='piece-promotion-option'><img src={`../assets/images/${setPromotionTeam()}-queen.png`} alt="Queen" /></div>
                     <div onClick={() => promotePawn("knight")} className='piece-promotion-option'><img src={`../assets/images/${setPromotionTeam()}-knight.png`} alt="Knight" /></div>
                     <div onClick={() => promotePawn("bishop")} className='piece-promotion-option'><img src={`../assets/images/${setPromotionTeam()}-bishop.png`} alt="Bishop" /></div>
                     <div onClick={() => promotePawn("rook")} className='piece-promotion-option'><img src={`../assets/images/${setPromotionTeam()}-rook.png`} alt="Rook" /></div>
+                </div>
+            </div>
+            <div className='card hidden' ref={checkmateRef}>
+                <div className='card-body'>
+                    <div className='checkmate-body'>
+                        <span>{chessboard.winningTeam} team won</span>
+                        <button onClick={restartGame}>Play again</button>
+                    </div>
                 </div>
             </div>
             <ChessBoard playMove={playMove} pieces={chessboard.pieces} />

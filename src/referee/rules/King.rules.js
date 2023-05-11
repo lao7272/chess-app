@@ -17,29 +17,38 @@ const getPossibleKingMoves = (king, boardState) => {
     const x = king.position.x;
     const y = king.position.y;
     let passedTile = new Position(x + 1, y + 1);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    if(!(x + 1 > 7 || y + 1 > 7)) {
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(x - 1 < 0 || y + 1 > 7)) {
+        passedTile = new Position(x - 1, y + 1);
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(x + 1 > 7 || y - 1 < 0)) {
+        passedTile = new Position(x + 1, y - 1)
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(x - 1 < 0 || y - 1 < 0)) {
+        passedTile = new Position(x - 1, y - 1)
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
 
-    passedTile = new Position(x - 1, y + 1);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-    passedTile = new Position(x + 1, y - 1)
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-    passedTile = new Position(x - 1, y - 1)
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-
-    passedTile = new Position(x, y + 1);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-    passedTile = new Position(x, y - 1);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-    passedTile = new Position(x + 1, y);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
-
-    passedTile = new Position(x - 1, y);
-    if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    if(!(y + 1 > 7)) {
+        passedTile = new Position(x, y + 1);
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(y - 1 < 0)) {
+        passedTile = new Position(x, y - 1);
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(x + 1 > 7)) {
+        passedTile = new Position(x + 1, y);
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
+    if(!(x - 1  < 0)) {
+        passedTile = new Position(x - 1, y);
+        if (tileIsEmptyOrCaptured(passedTile, boardState, king.team)) possibleMoves.push(passedTile);
+    }
 
     return possibleMoves;
 }
