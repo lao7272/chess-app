@@ -1,29 +1,20 @@
-import { 
-    getPossibleBishopMoves, 
-    getPossibleKingMoves, 
-    getPossibleKnightMoves, 
-    getPossiblePawnMoves, 
-    getPossibleQueenMoves, 
-    getPossibleRookMoves,
-    castling
-} from "../referee/rules";
 export default class Chessboard {
     constructor (pieces, totalTurns = 0, playHistory = []) {
         this.pieces = pieces;
         this.totalTurns = totalTurns;
-        this.winningTeam = null;
         this.playHistory = playHistory;
+        this.winningTeam = null;
     }
     get getCurrentTeam(){
         return this.totalTurns % 2 === 0 ? "black" : "white";
     }
     getPossibleMoves(){
         for (const piece of this.pieces) {
-            piece.possibleMoves = this.getValidMoves(piece);
+            piece.possibleMoves = piece.getPossibleMoves(this.pieces);
         }
         const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam);
         // Castling
-        king.possibleMoves = [...king.possibleMoves, ...castling(king, this.pieces)];
+        king.possibleMoves = [...king.possibleMoves, ...king.castling(this.pieces)];
         // Checks the current team valid moves
         this.getTeamDangerousMoves();
 
@@ -49,7 +40,7 @@ export default class Chessboard {
 
                 for(const enemy of filterTeamPieces){
                     const newEnemy = clonedBoard.pieces.find(p => p.samePosition(enemy.position) && p.team !== clonedBoard.getCurrentTeam);
-                    enemy.possibleMoves = clonedBoard.getValidMoves(newEnemy);
+                    enemy.possibleMoves = newEnemy.getPossibleMoves(this.pieces)
                     if (enemy.isPawn){
                         const isDangerousMove = enemy.possibleMoves.some(m => m.x !== enemy.position.x && m.samePosition(clonedKing.position));
                         if(isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
@@ -60,32 +51,20 @@ export default class Chessboard {
             }
         }
     }
-    getValidMoves (piece) {
-        switch (piece.type) {
-            case 'pawn':
-                return getPossiblePawnMoves(piece, this.pieces);
-            case 'knight':
-                return getPossibleKnightMoves(piece, this.pieces);
-            case 'bishop':
-                return getPossibleBishopMoves(piece, this.pieces);
-            case 'rook':
-                return getPossibleRookMoves(piece, this.pieces);
-            case 'queen':
-                return getPossibleQueenMoves(piece, this.pieces);
-            case 'king':
-                return getPossibleKingMoves(piece, this.pieces);
-            default:
-                return [];
-        }
-    }
-    playMove(currentPiece, desiredPosition, isEnPassant, validMove){
+    playMove(currentPiece, desiredPosition, validMove){
         const { x, y } = desiredPosition;
 
         const pawnDirection = currentPiece.team === 'white' ? 1 : -1;
+        let isEnPassant = false;
+        if(currentPiece.type === "pawn") {
+            isEnPassant = currentPiece.isEnPassant(desiredPosition, this.pieces);
+        }
         
         if(currentPiece.isKing && (currentPiece.position.x - desiredPosition.x === 2 || currentPiece.position.x - desiredPosition.x === -2)){
             const xPosition = currentPiece.position.x - desiredPosition.x === 2 ? 0 : 7;
             const yPosition = currentPiece.team === "white" ? 0 : 7;
+
+            // Check castling
             const rook = this.pieces.find(p => p.isRook && p.position.x === xPosition && p.position.y === yPosition);
             if (rook) {
                 this.pieces = this.pieces.map(piece => {
@@ -102,7 +81,9 @@ export default class Chessboard {
                 })
             }
             this.getPossibleMoves();
-        } else if (isEnPassant) {
+        } 
+        // Check enPassant
+        else if (isEnPassant) {
             this.pieces = this.pieces.reduce((result, piece) => {
                 if (piece.samePosition(currentPiece.position)) {
                     if (piece.isPawn) piece.enPassant = false;
@@ -119,15 +100,20 @@ export default class Chessboard {
                 return result
             }, []);
             this.getPossibleMoves();
-        } else if (validMove) {
+        } 
+        // Checks valid move
+        else if (validMove) {
             // UPDATES THE PIECE POSITION AND CAPTURES
             this.pieces = this.pieces.reduce((result, piece) => {
                 if (piece.samePosition(currentPiece.position)) {
                     // Special pawn move
                     if (piece.isPawn) piece.enPassant = Math.abs(currentPiece.position.y - y) === 2;
+                    if (piece.isKing || piece.isRook) {
+                        piece.hasMoved = true;
+                        console.log(piece)
+                    }
                     piece.position.x = x;
                     piece.position.y = y;
-                    piece.hasMoved = true;
                     result.push(piece);
 
                     this.playHistory.push(piece.position);

@@ -16,14 +16,13 @@ export default function Referee() {
         if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
         const validMove = currentPiece.possibleMoves.some(move => move.samePosition(desiredPosition));
         if (!validMove) return false;
-        const isEnPassant = isEnPassantCapture(currentPiece.position, desiredPosition, currentPiece.team, currentPiece.type);
 
         // Playmove modifies the board, therefore, the chessboard is updated
         setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
-            clonedChessboard.playMove(currentPiece, desiredPosition, isEnPassant, validMove); 
+            clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
             if (clonedChessboard.winningTeam) {
                 checkmateRef.current.classList.remove("hidden");
             }
@@ -41,19 +40,6 @@ export default function Referee() {
             });
         }
     }    
-    const isEnPassantCapture = (initialPosition, currentPosition, team, type) => {
-        const pawnDirection = team === 'white' ? 1 : -1;
-        if (type === 'pawn') {
-            if ((currentPosition.x - initialPosition.x === -1 || currentPosition.x - initialPosition.x === 1) && currentPosition.y - initialPosition.y === pawnDirection) {
-                const piece = chessboard.pieces.find(p => p.samePosition({
-                    x: currentPosition.x,
-                    y: currentPosition.y - pawnDirection
-                }) && p.isPawn && p.enPassant);
-                if (piece) return true;
-            }
-        }
-        return false;
-    }
     const promotePawn = (type) => {
         if (!pawnPromotion) return;
         promoteRef.current.classList.add('hidden');
