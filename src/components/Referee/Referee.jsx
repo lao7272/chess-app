@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import ChessBoard from '../Chessboard/Chessboard';
 import { initialChessboard } from '../../Constants';
-import { Piece } from '../../models';
 import './Referee.css';
+import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 
 export default function Referee() {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
@@ -23,9 +23,7 @@ export default function Referee() {
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
             clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
-            if (clonedChessboard.winningTeam) {
-                checkmateRef.current.classList.remove("hidden");
-            }
+            if (clonedChessboard.winningTeam) checkmateRef.current.classList.remove("hidden");
             return clonedChessboard;
         });
         // PAWN PROMOTION
@@ -47,14 +45,29 @@ export default function Referee() {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.pieces = clonedChessboard.pieces.reduce((result, piece) => {
                 if (piece.samePosition(pawnPromotion.position)) { 
-                    result.push(new Piece(piece.position.clone(), piece.team, type, true));
+                    switch(type) {
+                        case "queen":
+                            result.push(new Queen(piece.position.clone(), piece.team));
+                            break;
+                        case "knight":
+                            result.push(new Knight(piece.position.clone(), piece.team));
+                            break;
+                        case "bishop":
+                            result.push(new Bishop(piece.position.clone(), piece.team));
+                            break;
+                        case "rook":
+                            result.push(new Rook(piece.position.clone(), piece.team, true));
+                            break;
+                        default:
+                            break;
+                    }
                 } else {
                     result.push(piece);
                 }
                 return result;
             }, []);
-            clonedChessboard.getPossibleMoves()
-
+            clonedChessboard.getPossibleMoves();
+            if (clonedChessboard.winningTeam) checkmateRef.current.classList.remove("hidden");
             return clonedChessboard;
         });
         chessboard.getPossibleMoves();

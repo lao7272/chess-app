@@ -3,8 +3,8 @@ import Position from "../Positition";
 import Movement from "./Movement";
 const movement = new Movement();
 export default class Pawn extends Piece {
-    constructor (position, team, hasMoved, enPassant, possibleMoves = []) {
-        super(position, team, "pawn", hasMoved, possibleMoves);
+    constructor (position, team, enPassant, possibleMoves = []) {
+        super(position, team, "pawn", possibleMoves);
         this.enPassant = enPassant;
     }
     getPossibleMoves (pieces) {
@@ -56,6 +56,6 @@ export default class Pawn extends Piece {
         return false;
     }
     clone(){
-        return new Pawn(this.position.clone(), this.team, this.hasMoved, this.enPassant, this.possibleMoves.map(move => move.clone()));
+        return new Pawn(this.position.clone(), this.team, this.enPassant, this.possibleMoves.map(move => move.clone()));
     }
 }

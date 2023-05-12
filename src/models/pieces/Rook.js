@@ -4,7 +4,8 @@ import Movement from "./Movement";
 const movement = new Movement();
 export default class Rook extends Piece {
     constructor (position, team, hasMoved, possibleMoves = []) {
-        super(position, team, "rook", hasMoved, possibleMoves);
+        super(position, team, "rook", possibleMoves);
+        this.hasMoved = hasMoved;
     }
 
     getPossibleMoves(pieces) {

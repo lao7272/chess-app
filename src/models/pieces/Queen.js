@@ -3,8 +3,8 @@ import Position from "../Positition";
 import Movement from "./Movement";
 const movement = new Movement();
 export default class Queen extends Piece {
-    constructor (position, team, hasMoved, possibleMoves = []) {
-        super(position, team, "queen", hasMoved, possibleMoves);
+    constructor (position, team, possibleMoves = []) {
+        super(position, team, "queen", possibleMoves);
     }
     getPossibleMoves(pieces) {
         const x = this.position.x;
@@ -86,6 +86,6 @@ export default class Queen extends Piece {
         return this.possibleMoves;
     }
     clone(){
-        return new Queen(this.position.clone(), this.team, this.hasMoved, this.possibleMoves.map(move => move.clone()));
+        return new Queen(this.position.clone(), this.team, this.possibleMoves.map(move => move.clone()));
     }
 }

@@ -32,15 +32,17 @@ export default class Chessboard {
         for (const piece of this.pieces.filter(p => p.team === this.getCurrentTeam)) {
             for (const move of piece.possibleMoves) {
                 const clonedBoard = this.clone();
-                clonedBoard.pieces = clonedBoard.pieces.filter(p => !p.samePosition(move))
+                clonedBoard.pieces = clonedBoard.pieces.filter(p => !p.samePosition(move));
                 const clonedPiece = clonedBoard.pieces.find(p => p.samePosition(piece.position));
                 clonedPiece.position = move.clone();
-                const clonedKing  = clonedBoard.pieces.find(p => p.isKing && p.team === clonedBoard.getCurrentTeam);
+                const clonedKing = clonedBoard.pieces.find(p => p.isKing && p.team === clonedBoard.getCurrentTeam);
                 const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !==  clonedBoard.getCurrentTeam);
 
                 for(const enemy of filterTeamPieces){
+                    enemy.possibleMoves = [];
                     const newEnemy = clonedBoard.pieces.find(p => p.samePosition(enemy.position) && p.team !== clonedBoard.getCurrentTeam);
-                    enemy.possibleMoves = newEnemy.getPossibleMoves(this.pieces)
+                    enemy.possibleMoves = newEnemy.getPossibleMoves(clonedBoard.pieces);
+
                     if (enemy.isPawn){
                         const isDangerousMove = enemy.possibleMoves.some(m => m.x !== enemy.position.x && m.samePosition(clonedKing.position));
                         if(isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
@@ -110,7 +112,6 @@ export default class Chessboard {
                     if (piece.isPawn) piece.enPassant = Math.abs(currentPiece.position.y - y) === 2;
                     if (piece.isKing || piece.isRook) {
                         piece.hasMoved = true;
-                        console.log(piece)
                     }
                     piece.position.x = x;
                     piece.position.y = y;

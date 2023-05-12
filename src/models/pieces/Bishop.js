@@ -3,8 +3,8 @@ import Position from "../Positition";
 import Movement from "./Movement";
 const movement = new Movement();
 export default class Bishop extends Piece {
-    constructor (position, team, hasMoved, possibleMoves = []) {
-        super(position, team, "bishop", hasMoved, possibleMoves);
+    constructor (position, team, possibleMoves = []) {
+        super(position, team, "bishop", possibleMoves);
     }
     getPossibleMoves (pieces) {
         const x = this.position.x;
@@ -49,6 +49,6 @@ export default class Bishop extends Piece {
         return this.possibleMoves;
     }
     clone(){
-        return new Bishop(this.position.clone(), this.team, this.hasMoved, this.possibleMoves.map(move => move.clone()));
+        return new Bishop(this.position.clone(), this.team, this.possibleMoves.map(move => move.clone()));
     }
 }

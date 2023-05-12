@@ -1,11 +1,10 @@
 
 export default class Piece{
-    constructor (position, team, type, hasMoved, possibleMoves = []) {
+    constructor (position, team, type, possibleMoves = []) {
         this.image = `./assets/images/${team}-${type}.png`;
         this.position = position;
         this.team = team;
         this.type = type;
-        this.hasMoved = hasMoved;
         this.possibleMoves = possibleMoves;
     }
     get isPawn() {
@@ -29,7 +28,5 @@ export default class Piece{
     samePosition(desiredPostion){
         return this.position.samePosition(desiredPostion);
     }
-    clone(){
-        return new Piece(this.position.clone(), this.team, this.type, this.hasMoved, this.possibleMoves.map(move => move.clone()))
-    }
+
 }
