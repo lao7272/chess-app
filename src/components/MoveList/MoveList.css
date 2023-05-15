@@ -1,0 +1,28 @@
+.move-list {
+    background-color: #171717;
+    margin-left: 20px;
+    height: 500px;
+    width: 350px;
+    color: white;
+}
+.move-list > .move-list-header {
+    text-align: center;
+    font-weight: bold;
+    margin: 15px;
+}
+.move-list-body {
+    width: 80%;
+    margin: 0 auto;
+}
+/* .move {
+    padding: 0 10px 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    font-weight: bold;
+    border: 1px solid #000;
+}
+.move > img {
+    width: 30px;
+} */

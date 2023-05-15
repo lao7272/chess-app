@@ -1,21 +1,41 @@
-.card > .card-body > .checkmate-body {
-    width: 30%;
+.checkmate-card {
+    width: 280px;
+    height: 50%;
+    background-color: #575757;
+    color: #fff;
+    position: absolute;
+    top: calc(50% - 110px);
+    left: calc(50% - 140px);
+    border-radius: 15px;
+    border: 1.4px solid #000;
+}
+.checkmate-card > .checkmate-card-body {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    align-items: center;
+    justify-content: space-around;
 }
 
-.card > .card-body > .checkmate-body > span {
-    font-size: 32px;
-    color: white;
-}
-
-.card > .card-body > .checkmate-body > button {
-    border-radius: 3px;
+.checkmate-card > .checkmate-card-body > button {
+    color: #fff;
+    background: none;
     border: none;
-    padding: 10px;
-    font-size: 20px;
+    padding: 12px;
+    border: 1.4px solid #fff;
+    border-radius: 10px;
+    font-size: 18px;
 }
-.card > .card-body > .checkmate-body > button:hover {
+.checkmate-card > .checkmate-card-body button:hover {
+    background: #6c6c6c;
     cursor: pointer;
+    transition: all .3s;
+}
+
+.checkmate-card > .checkmate-card-body > span {
+    border-bottom: 1.5px solid #fff;
+    font-weight: bold;
+    font-size: 30px;
+    text-transform: capitalize;
 }

@@ -1,19 +1,19 @@
 export default class Chessboard {
-    constructor (pieces, totalTurns = 0, playHistory = []) {
+    constructor(pieces, totalTurns = 0, moveList = []) {
         this.pieces = pieces;
         this.totalTurns = totalTurns;
-        this.playHistory = playHistory;
+        this.moveList = moveList;
         this.winningTeam = null;
         this.draw = false;
     }
-    get getCurrentTeam(){
+    get getCurrentTeam() {
         return this.totalTurns % 2 === 0 ? "black" : "white";
     }
-    getPossibleMoves(){
+    getPossibleMoves() {
         if (this.pieces.length === 2) {
             this.draw = true;
             return;
-        } 
+        }
         for (const piece of this.pieces) {
             piece.possibleMoves = piece.getPossibleMoves(this.pieces);
         }
@@ -29,15 +29,15 @@ export default class Chessboard {
             }
         }
         const getTeamPieces = this.pieces.filter(p => p.team === this.getCurrentTeam);
-        if(getTeamPieces.some(p => p.possibleMoves.length > 0 )) return;
-        if(this.isKingChecked(king)){
+        if (getTeamPieces.some(p => p.possibleMoves.length > 0)) return;
+        if (this.isKingChecked(king)) {
             this.winningTeam = this.getCurrentTeam === 'white' ? "black" : "white";
         } else {
             this.draw = true;
         }
     }
-    
-    getTeamDangerousMoves(){
+
+    getTeamDangerousMoves() {
 
         for (const piece of this.pieces.filter(p => p.team === this.getCurrentTeam)) {
             for (const move of piece.possibleMoves) {
@@ -47,17 +47,17 @@ export default class Chessboard {
                 const clonedPiece = clonedBoard.pieces.find(p => p.samePosition(piece.position));
                 clonedPiece.position = move.clone();
                 const clonedKing = clonedBoard.pieces.find(p => p.isKing && p.team === clonedBoard.getCurrentTeam);
-                const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !==  clonedBoard.getCurrentTeam);
+                const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !== clonedBoard.getCurrentTeam);
 
-                for(const enemy of filterTeamPieces){
+                for (const enemy of filterTeamPieces) {
                     enemy.possibleMoves = [];
                     const newEnemy = clonedBoard.pieces.find(p => p.samePosition(enemy.position) && p.team !== clonedBoard.getCurrentTeam);
                     enemy.possibleMoves = newEnemy.getPossibleMoves(clonedBoard.pieces);
-                    if (enemy.isPawn){
+                    if (enemy.isPawn) {
                         const isDangerousMove = enemy.possibleMoves.some(m => m.x !== enemy.position.x && m.samePosition(clonedKing.position));
-                        if(isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
+                        if (isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
                     } else {
-                        if(enemy.possibleMoves.some(m => m.samePosition(clonedKing.position))) {
+                        if (enemy.possibleMoves.some(m => m.samePosition(clonedKing.position))) {
                             piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
                         };
                     }
@@ -66,22 +66,22 @@ export default class Chessboard {
         }
     }
     isKingChecked(king) {
-        for(const enemy of this.pieces.filter(p => p.team !== this.getCurrentTeam)) {
+        for (const enemy of this.pieces.filter(p => p.team !== this.getCurrentTeam)) {
             const isChecked = enemy.getPossibleMoves(this.pieces).some(m => m.samePosition(king.position));
-            if(isChecked) return true;
+            if (isChecked) return true;
         }
         return false;
     }
-    playMove(currentPiece, desiredPosition, validMove){
+    playMove(currentPiece, desiredPosition, validMove) {
         const { x, y } = desiredPosition;
 
         const pawnDirection = currentPiece.team === 'white' ? 1 : -1;
         let isEnPassant = false;
-        if(currentPiece.type === "pawn") {
+        if (currentPiece.type === "pawn") {
             isEnPassant = currentPiece.isEnPassant(desiredPosition, this.pieces);
         }
-        
-        if(currentPiece.isKing && (currentPiece.position.x - desiredPosition.x === 2 || currentPiece.position.x - desiredPosition.x === -2)){
+
+        if (currentPiece.isKing && (currentPiece.position.x - desiredPosition.x === 2 || currentPiece.position.x - desiredPosition.x === -2)) {
             const xPosition = currentPiece.position.x - desiredPosition.x === 2 ? 0 : 7;
             const yPosition = currentPiece.team === "white" ? 0 : 7;
 
@@ -91,18 +91,15 @@ export default class Chessboard {
                 this.pieces = this.pieces.map(piece => {
                     if (piece.samePosition(currentPiece.position)) {
                         piece.position.x = desiredPosition.x;
-                        this.playHistory.push(piece.position);
-                    } if (piece.samePosition(rook.position)) {
+                                    } if (piece.samePosition(rook.position)) {
                         const direction = xPosition === 0 ? -1 : 1;
                         piece.position.x = desiredPosition.x - direction;
-
-                        this.playHistory.push(piece.position);
                     }
                     return piece;
                 })
             }
             this.getPossibleMoves();
-        } 
+        }
         // Check enPassant
         else if (isEnPassant) {
             this.pieces = this.pieces.reduce((result, piece) => {
@@ -113,15 +110,15 @@ export default class Chessboard {
                     piece.hasMoved = true;
                     result.push(piece);
 
-                    this.playHistory.push(piece.position);
-                } else if (!piece.samePosition({x, y: y - pawnDirection})) {
+            
+                } else if (!piece.samePosition({ x, y: y - pawnDirection })) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
                 }
                 return result
             }, []);
             this.getPossibleMoves();
-        } 
+        }
         // Checks valid move
         else if (validMove) {
             // UPDATES THE PIECE POSITION AND CAPTURES
@@ -136,8 +133,8 @@ export default class Chessboard {
                     piece.position.y = y;
                     result.push(piece);
 
-                    this.playHistory.push(piece.position);
-                } else if (!piece.samePosition({x, y})) {
+            
+                } else if (!piece.samePosition({ x, y })) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
                 }
@@ -150,7 +147,7 @@ export default class Chessboard {
         return true
     }
 
-    clone(){
-        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.playHistory);
+    clone() {
+        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.moveList);
     }
 } 

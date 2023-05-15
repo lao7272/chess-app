@@ -5,6 +5,7 @@ import Endgame from '../Endgame/Endgame';
 import { initialChessboard } from '../../Constants';
 import './Referee.css';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
+import MoveList from '../MoveList/MoveList';
 
 export default function Referee() {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
@@ -25,6 +26,15 @@ export default function Referee() {
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
             clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
+            // MOVE NOTATION
+            const lastMove = clonedChessboard.moveList ? clonedChessboard.moveList[clonedChessboard.moveList.length - 1] : undefined;
+            if(!lastMove || lastMove.length === 2) {
+                clonedChessboard.moveList.push([{type: currentPiece.type, position: desiredPosition, image: currentPiece.image}]);
+            } else if(lastMove.length < 2) {
+                clonedChessboard.moveList[clonedChessboard.moveList.length - 1].push({type: currentPiece.type, position: desiredPosition, image: currentPiece.image})
+            }
+            
+            // CHECK IF IT IS A DRAW
             if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
             return clonedChessboard;
         });
@@ -83,15 +93,21 @@ export default function Referee() {
     function restartGame() {
         checkmateRef.current.classList.add("hidden");
         setChessboard(initialChessboard.clone());
+        setChessboard(() => {
+            const clonedChessboard = initialChessboard.clone();
+            clonedChessboard.totalTurns = 1;
+            clonedChessboard.moveList = [];
+            return clonedChessboard;
+        });
     }
     return (
         <>
-            <div style={{color: "white", display:"flex", margin: "10px 10px 10px 0px", fontSize: "24px"}}>
-                Total Moves:<div style={{marginLeft: "10px"}}> {chessboard.totalTurns}</div>
-            </div>
+            <main className='main-container'>
+                <ChessBoard playMove={playMove} pieces={chessboard.pieces}/>
+                <MoveList moveList={chessboard.moveList}/>
+            </main>
             <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
             <Endgame winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
-            <ChessBoard playMove={playMove} pieces={chessboard.pieces}/>
         </>
     )
 }
