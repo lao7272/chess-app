@@ -10,6 +10,7 @@ import MoveList from '../MoveList/MoveList';
 export default function Referee() {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
+    const [moveList, setMoveList] = useState(chessboard.moveList);
 
     const promoteRef = useRef(null);
     const checkmateRef = useRef(null);
@@ -33,7 +34,7 @@ export default function Referee() {
             } else if(lastMove.length < 2) {
                 clonedChessboard.moveList[clonedChessboard.moveList.length - 1].push({type: currentPiece.type, position: desiredPosition, image: currentPiece.image})
             }
-            
+            setMoveList(clonedChessboard.moveList)
             // CHECK IF IT IS A DRAW
             if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
             return clonedChessboard;
@@ -92,11 +93,11 @@ export default function Referee() {
     }
     function restartGame() {
         checkmateRef.current.classList.add("hidden");
-        setChessboard(initialChessboard.clone());
         setChessboard(() => {
             const clonedChessboard = initialChessboard.clone();
-            clonedChessboard.totalTurns = 1;
-            clonedChessboard.moveList = [];
+            initialChessboard.totalTurns = 1;
+            initialChessboard.moveList = [];
+            setMoveList([]);
             return clonedChessboard;
         });
     }
@@ -104,7 +105,8 @@ export default function Referee() {
         <>
             <main className='main-container'>
                 <ChessBoard playMove={playMove} pieces={chessboard.pieces}/>
-                <MoveList moveList={chessboard.moveList}/>
+                <MoveList moveList={moveList} chessboard={chessboard}/>
+
             </main>
             <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
             <Endgame winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>

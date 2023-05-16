@@ -7,7 +7,10 @@ export default function Move({pieces, moveIndex} ) {
             {
                 pieces.map((piece, i) => {
                     const pieceImage = piece.type === "pawn" ? "" : <img src={piece.image} alt={piece.type}/>;
-                    return <div key={crypto.randomUUID()}>{pieceImage} {HORIZONTAL_AXIS[piece.position.x]} {VERTICAL_AXIS[piece.position.y]}</div>
+                    
+                    return (
+                            <div key={crypto.randomUUID()} className='move-items'>{pieceImage} {HORIZONTAL_AXIS[piece.position.x]} {VERTICAL_AXIS[piece.position.y]}</div>
+                        )
                 })
             }
         </div>
