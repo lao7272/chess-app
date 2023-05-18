@@ -1,0 +1,37 @@
+.move-list {
+    background-color: #171717;
+    margin-left: 20px;
+    height: 500px;
+    width: 350px;
+    color: white;
+    border-radius: 8px;
+}
+.move-list > .move-list-header {
+    text-align: center;
+    font-weight: bold;
+    margin: 15px;
+}
+.move-list-body {
+    height: 445px;
+    overflow-y: scroll;
+}
+
+.move {
+    height: 41px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    font-weight: bold;
+    border-bottom: 1px solid #000;
+    background-color: #3b3b3b;
+}
+.move > .move-items {
+    width: 100px;
+    display: flex;
+    align-items: center;
+}
+.move > .move-items > img {
+    width: 30px;
+}
