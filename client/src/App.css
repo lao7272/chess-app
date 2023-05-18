@@ -1,9 +1,8 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&family=Rubik:wght@300&display=swap'); */
+
 @import url('https://fonts.googleapis.com/css2?family=Francois+One&display=swap');
 *{
   padding: 0;
   margin: 0;
-  /* font-family: 'Rubik', sans-serif;  */
   font-family: 'Francois One', sans-serif;
 }
 .app {
@@ -13,3 +12,5 @@
   height: 100vh;
   background-color: #312e2b;
 }
+
+/* background: #212022; */

@@ -2,12 +2,12 @@ import React, { useRef, useState } from 'react';
 import ChessBoard from '../Chessboard/Chessboard';
 import PromotionAlert from '../PromotionAlert/PromotionAlert';
 import GameOver from '../GameOver/GameOver';
-import { initialChessboard } from '../../Constants';
-import './Referee.css';
-import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import MoveList from '../MoveList/MoveList';
+import { initialChessboard } from '../../Constants';
+import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
+import './Referee.css';
 
-export default function Referee() {
+export default function Referee({socket}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
     const [moveList, setMoveList] = useState(chessboard.moveList);
