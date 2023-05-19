@@ -2,11 +2,11 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-
+import config from "./src/config/config.js";
 const app = express();
 const httpServer = createServer(app);
 
-const PORT = 8080;
+const {PORT} = config;
 
 
 const io = new Server(httpServer, {
