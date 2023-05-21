@@ -19,7 +19,7 @@ export default class Pawn extends Piece {
     
         if(!movement.tileIsOccupied(normalMove, pieces)) this.possibleMoves.push(normalMove);
         
-        if(this.position.y === specialRow && !movement.tileIsOccupied(specialMove, pieces)){
+        if(this.position.y === specialRow && !movement.tileIsOccupied(specialMove, pieces) && !movement.tileIsOccupied(normalMove, pieces)){
             this.possibleMoves.push(specialMove); 
         } 
         // CAPTURE

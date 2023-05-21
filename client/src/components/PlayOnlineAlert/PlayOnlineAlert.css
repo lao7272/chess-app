@@ -1,11 +1,12 @@
 .play-alert {
     width: 350px;
     height: 200px;
+    background-color: beige;
     border-radius: 15px;
     position: absolute;
-    background-color: beige;
-    top: 35%;
-    left: 37%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -24,30 +25,36 @@
     font-size: 16px;
     border-radius: 10px;
 }
+
 .play-btn-hover:hover {
     cursor: pointer;
     background-color: #75a068;
-    transition: all .3s ease-in-out; 
+    transition: all .3s ease-in-out;
 }
+
 .play-btn-disabled {
     background-color: #86b478;
 }
+
 .play-input-container {
     display: flex;
     align-items: center;
     gap: 8px;
 }
-.play-input-container > label{
+
+.play-input-container>label {
     width: 38%;
     font-size: 16px;
 }
-.play-input-container > input {
+
+.play-input-container>input {
     font-size: 16px;
     border: none;
     outline: none;
     padding: 8px;
     border-radius: 5px;
 }
-.play-input-container > button {
+
+.play-input-container>button {
     width: 20%;
 }

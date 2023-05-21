@@ -8,9 +8,6 @@ export default function Home ({socket}) {
 
     async function generateRoom() {
         socket.emit("generate-room");
-        socket.on("room-id", room => {
-            console.log(room);
-        });
     }
     function joinRoom(room) {
         if(room === "") return;

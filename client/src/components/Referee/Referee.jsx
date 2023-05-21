@@ -7,10 +7,12 @@ import { initialChessboard } from '../../Constants';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
 
-export default function Referee({socket}) {
+export default function Referee({onlineTeam}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
     const [moveList, setMoveList] = useState(chessboard.moveList);
+    const [turn, setTurn] = useState(onlineTeam || "white");
+    console.log(onlineTeam)
 
     const promoteRef = useRef(null);
     const checkmateRef = useRef(null);
@@ -18,6 +20,7 @@ export default function Referee({socket}) {
     function playMove(currentPiece, desiredPosition) {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
         if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
+
         const validMove = currentPiece.possibleMoves.some(move => move.samePosition(desiredPosition));
         if (!validMove) return false;
 
@@ -34,9 +37,12 @@ export default function Referee({socket}) {
             if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
             return clonedChessboard;
         });
-        setMoveList(chessboard.moveList);
+        // SETS TEAM TURN
+        const nextTurn = onlineTeam ? onlineTeam : turn === 'white' ? 'black' : 'white';
+        setTurn(nextTurn);
         // PAWN PROMOTION
         checkPawnPromotion(currentPiece, desiredPosition);
+        setMoveList(chessboard.moveList);
     }   
     function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard) {
         const lastMove = chessboard.moveList ? chessboard.moveList[chessboard.moveList.length - 1] : undefined;
@@ -60,7 +66,7 @@ export default function Referee({socket}) {
             chessboard.moveList[chessboard.moveList.length - 1].push(move);
         }
     }
-    function checkPawnPromotion (piece, desiredPosition, ) {
+    function checkPawnPromotion (piece, desiredPosition ) {
         const promotion = piece.team === "white" ? 7 : 0;
 
         if (desiredPosition.y === promotion && piece.isPawn) {
@@ -124,10 +130,10 @@ export default function Referee({socket}) {
     return (
         <>
             <main className='main-container'>
-                <ChessBoard playMove={playMove} pieces={chessboard.pieces}/>
+                <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
                 <MoveList moveList={moveList} chessboard={chessboard}/>
-            <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-            <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
+                <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
+                <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
             </main>
         </>
     )

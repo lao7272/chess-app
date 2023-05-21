@@ -18,7 +18,7 @@ export default function PlayOnlineAlert({generateRoom, joinRoom, socket}) {
                 <label htmlFor="room">Join Room</label>
                 <input onChange={e => {
                     const value = e.target.value;
-                    setInputRoom(value)
+                    setInputRoom(value.trim())
                 }} type="text" id="room" placeholder="Enter room code"/> 
                 { roomExists ? <Link to={`/game`} className="play-btn play-btn-hover" onClick={() => joinRoom(inputRoom)}>Join</Link> : <span className="play-btn play-btn-disabled">Join</span>}
             </div>
