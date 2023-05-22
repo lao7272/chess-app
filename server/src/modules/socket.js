@@ -12,7 +12,7 @@ function gameServer (server) {
     io.on("connection", socket => {
         console.log(`Socket connected. Id: ${socket.id}`);
 
-        socket.on("generate-room", async (gamePieces, moveList, turns) => {
+        socket.on("generate-room", async () => {
             try {
                 const room = generateRoom();
                 // const game = {

@@ -1,6 +1,10 @@
+import Position from "./Positition";
+import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
+
 export default class Chessboard {
-    constructor(pieces, totalTurns = 0, moveList = []) {
+    constructor(pieces, totalTurns = 1, moveList = [], onlineTeam = null) {
         this.pieces = pieces;
+        this.onlineTeam = onlineTeam;
         this.totalTurns = totalTurns;
         this.moveList = moveList;
         this.winningTeam = null;
@@ -10,6 +14,14 @@ export default class Chessboard {
         return this.totalTurns % 2 === 0 ? "black" : "white";
     }
     getPossibleMoves() {
+        if (this.onlineTeam && this.onlineTeam !== this.getCurrentTeam) {
+            for (const piece of this.pieces) {
+                if (piece.team !== this.onlineTeam) {
+                    piece.possibleMoves = [];
+                }
+            }
+            return
+        }
         if (this.pieces.length === 2) {
             this.draw = true;
             return;
@@ -17,18 +29,19 @@ export default class Chessboard {
         for (const piece of this.pieces) {
             piece.possibleMoves = piece.getPossibleMoves(this.pieces);
         }
-        const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam);
+        const currentTeam = this.getCurrentTeam;
+        const king = this.pieces.find(p => p.isKing && p.team === currentTeam);
         // Castling
         king.possibleMoves = [...king.possibleMoves, ...king.castling(this.pieces)];
         // Checks the current team valid moves
         this.getTeamDangerousMoves();
 
         for (const piece of this.pieces) {
-            if (piece.team !== this.getCurrentTeam) {
+            if (piece.team !== currentTeam) {
                 piece.possibleMoves = [];
             }
         }
-        const getTeamPieces = this.pieces.filter(p => p.team === this.getCurrentTeam);
+        const getTeamPieces = this.pieces.filter(p => p.team === currentTeam);
         if (getTeamPieces.some(p => p.possibleMoves.length > 0)) return;
         if (this.isKingChecked(king)) {
             this.winningTeam = this.getCurrentTeam === 'white' ? "black" : "white";
@@ -91,7 +104,7 @@ export default class Chessboard {
                 this.pieces = this.pieces.map(piece => {
                     if (piece.samePosition(currentPiece.position)) {
                         piece.position.x = desiredPosition.x;
-                                    } if (piece.samePosition(rook.position)) {
+                    } if (piece.samePosition(rook.position)) {
                         const direction = xPosition === 0 ? -1 : 1;
                         piece.position.x = desiredPosition.x - direction;
                     }
@@ -110,7 +123,7 @@ export default class Chessboard {
                     piece.hasMoved = true;
                     result.push(piece);
 
-            
+
                 } else if (!piece.samePosition({ x, y: y - pawnDirection })) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
@@ -133,7 +146,7 @@ export default class Chessboard {
                     piece.position.y = y;
                     result.push(piece);
 
-            
+
                 } else if (!piece.samePosition({ x, y })) {
                     if (piece.isPawn) piece.enPassant = false;
                     result.push(piece);
@@ -147,7 +160,52 @@ export default class Chessboard {
         return true
     }
 
+    addOnlineProperties(pieces, moveList) {
+        const newPieces = [];
+        const newMoveList = [];
+        
+        for (const piece of pieces) {
+            switch (piece.type) {
+                case "pawn":
+                    //piece.position.x, piece.position.y
+                    newPieces.push(new Pawn(new Position(piece.position.x, piece.position.y), piece.team, piece.enPassant));
+                    break;
+                case "bishop":
+                    newPieces.push(new Bishop(new Position(piece.position.x, piece.position.y), piece.team));
+                    break;
+                case "rook":
+                    newPieces.push(new Rook(new Position(piece.position.x, piece.position.y), piece.team, piece.hasMoved));
+                    break;
+                case "knight":
+                    newPieces.push(new Knight(new Position(piece.position.x, piece.position.y), piece.team));
+                    break;
+                case "queen":
+                    newPieces.push(new Queen(new Position(piece.position.x, piece.position.y), piece.team));
+                    break;
+                case "king":
+                    newPieces.push(new King(new Position(piece.position.x, piece.position.y), piece.team, piece.hasMoved));
+                    break;
+            }
+            
+        }
+        
+        for (const moveArray of moveList) {
+            const newMoveArray = [];
+            for(const move of moveArray) {
+                const newMove = {
+                    prevPosition: new Position(move.prevPosition.x, move.prevPosition.y),
+                    position: new Position(move.position.x, move.position.y),
+                    ...move
+                }
+                newMoveArray.push(newMove);
+            }
+            newMoveList.push(newMoveArray)
+        }
+        this.pieces = newPieces;
+        this.moveList = newMoveList;
+        this.getPossibleMoves()
+    }
     clone() {
-        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.moveList);
+        return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.moveList, this.onlineTeam);
     }
 } 
