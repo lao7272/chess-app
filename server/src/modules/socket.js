@@ -11,17 +11,12 @@ function gameServer (server) {
 
     io.on("connection", socket => {
         console.log(`Socket connected. Id: ${socket.id}`);
-
         socket.on("generate-room", async () => {
             try {
                 const room = generateRoom();
                 // const game = {
                 //     gameId: room,
-                //     userOne: socket.id,
-                //     isFull: false,
-                //     gamePieces: JSON.stringify(gamePieces),
-                //     moveList: JSON.stringify(moveList),
-                //     turns
+                //     userOne: socket.id
                 // }
                 // await GameDB.create(game);
                 socket.join(room);
@@ -34,7 +29,7 @@ function gameServer (server) {
         socket.on("join-room", async (room) => {
             const rooms = io.sockets.adapter.rooms;
             const hasRooms = rooms.has(room);
-            //const getGame = await GameDB.read(`WHERE gameId = ${room}`)
+            // const getGame = await GameDB.read(`WHERE gameId = '${room}'`)
             if(!hasRooms) {
                 socket.emit('room-error', {success: false, message: "Room does not exit."}); 
                 return; 
@@ -45,8 +40,7 @@ function gameServer (server) {
                 return;
             }
             // const game = {
-            //     userTwo: socket.id,
-            //     isFull: true
+            //     userTwo: socket.id
             // }
             // await GameDB.update(game, `WHERE gameId = ${getGame.gameId}`);
             socket.join(room);
@@ -55,26 +49,35 @@ function gameServer (server) {
         });
         socket.on("check-room", room => {
             const rooms = io.sockets.adapter.rooms;
-            if(rooms.has(room)) {
-                if (rooms.get(room).size === 2) {
-                    socket.emit("room-exists", false);
-                    return;
-                }
+            if (rooms.has(room) && rooms.get(room).size === 2) {
+                socket.emit("room-exists", false);
+                return;
             }
             socket.emit("room-exists", rooms.has(room));
         })
 
-        socket.on("move", (chessboard) => {
-            socket.broadcast.emit("opponent-move", chessboard);
+        socket.on("move", (move, room) => {
+            io.to(room).emit("opponent-move", move);
         });
-        socket.on("disconnect", () => {
+        socket.on("disconnect", async () => {
+            try {
+                const rooms = io.sockets.adapter.rooms;
+                //const currRoom = await GameDB.read(`WHERE userOne = '${socket.id}' OR userTwo = '${socket.id}'`);
 
-            if(socket.id) {
+                rooms.delete(socket.id);
+                console.log(`${socket.id} disconnected`);
+                // if (!currRoom) return;
+                // if(socket.id === currRoom.userOne) {
+                //     await GameDB.update({userOne: null}, `userOne = ${socket.id}`)
+                // } else if (socket.id === currRoom.userTwo) {
+                //     await GameDB.update({userTwo: null}, `userTwo = ${socket.id}`)
+                // } else {
 
-            } else if(socket.id) {
-
+                // }
+            } catch (err) {
+                console.error(err)
             }
-            console.log(`${socket.id} disconnected`);
+            
         })
     })
 }

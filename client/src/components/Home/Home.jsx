@@ -4,16 +4,7 @@ import "./Home.css"
 import PlayOnlineAlert from "../PlayOnlineAlert/PlayOnlineAlert";
 
 export default function Home ({socket}) {
-    const [playOnline, setPlayOnline] = useState(false);
-
-    async function generateRoom() {
-        socket.emit("generate-room");
-    }
-    function joinRoom(room) {
-        if(room === "") return;
-        socket.emit("join-room", room);
-    }
-    
+    const [playOnline, setPlayOnline] = useState(false);    
     return(
         <>
             <div>
@@ -24,7 +15,7 @@ export default function Home ({socket}) {
                 </div>
             </div>
             {
-                playOnline && <PlayOnlineAlert generateRoom={generateRoom} joinRoom={joinRoom} socket={socket}/>
+                playOnline && <PlayOnlineAlert  socket={socket}/>
             }
             
         </>

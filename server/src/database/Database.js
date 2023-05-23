@@ -16,7 +16,7 @@ export default class Postgresql {
     
     async create(object) {
         try {
-            const columns = Object.keys(object).join();
+            const columns = Object.keys(object).join(', ');
             const values = Object.values(object);
             const queryString = `INSERT INTO ${this.table} (${columns}) VALUES (${values.map((v, i) => `$${i + 1}`).join(', ')}) RETURNING *;`
             return (await this.pool.query(queryString, values)).rows;
@@ -29,7 +29,7 @@ export default class Postgresql {
             const query = `SELECT * FROM ${this.table} ${condition}`;
             return (await this.pool.query(query)).rows;
         } catch (err) {
-            console.log(err);
+            console.error(`PostgreSQL error ${err}`)
         }
     }
     async update(object, condition) {

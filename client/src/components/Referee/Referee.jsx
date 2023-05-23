@@ -28,21 +28,15 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
         if(!opponentMove) return
         setChessboard(currChessBoard => {
             const clonedChessboard = currChessBoard.clone();
-            clonedChessboard.addOnlineProperties(opponentMove.pieces, opponentMove.moveList);
-            clonedChessboard.totalTurns = opponentMove.totalTurns;
-            clonedChessboard.onlineTeam = onlineTeam;
+            clonedChessboard.addOnlineProperties(opponentMove.pieces, opponentMove.moveList, opponentMove.totalTurns, onlineTeam);
             setMoveList(clonedChessboard.moveList)
             return clonedChessboard;
         });
     }, [opponentMove])
     
     function playMove(currentPiece, desiredPosition) {
-        if (onlineTeam && currentPiece.team !== onlineTeam) {
-            return false;
-        } else {
-            if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
-            if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
-        }
+        if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
+        if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
         const validMove = currentPiece.possibleMoves.some(move => move.samePosition(desiredPosition));
         if (!validMove) return false;
 
@@ -51,14 +45,17 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
             const clonedChessboard = chessboard.clone();
             const prevPiecesLen = clonedChessboard.pieces.length;
             clonedChessboard.totalTurns++;
-            clonedChessboard.onlineTeam = onlineTeam;
             // MOVE LOGIC
             clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
             // MOVE NOTATION
             moveNotation(prevPiecesLen, clonedChessboard.pieces.length, currentPiece, desiredPosition, clonedChessboard);
             // CHECK IF IT IS A DRAW
             if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
-            if(onlineTeam) setMove(clonedChessboard);
+            if(onlineTeam) setMove({
+                pieces: clonedChessboard.pieces, 
+                moveList: clonedChessboard.moveList, 
+                totalTurns: clonedChessboard.totalTurns
+            });
             return clonedChessboard;
         });
         // SETS TEAM TURN
@@ -155,11 +152,13 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     return (
         <>
             <main className='main-container'>
-                {room && <div>Room: {room}</div>}
-                <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
+                <div className='chessboard-container'>
+                    {room && <div className='room'><b>GameId</b>: {room}</div>}
+                    <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
+                    <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
+                    <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
+                </div>
                 <MoveList moveList={moveList} chessboard={chessboard}/>
-                <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-                <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
             </main>
         </>
     )

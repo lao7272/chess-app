@@ -160,7 +160,7 @@ export default class Chessboard {
         return true
     }
 
-    addOnlineProperties(pieces, moveList) {
+    addOnlineProperties(pieces, moveList, totalTurns, onlineTeam) {
         const newPieces = [];
         const newMoveList = [];
         
@@ -203,7 +203,9 @@ export default class Chessboard {
         }
         this.pieces = newPieces;
         this.moveList = newMoveList;
-        this.getPossibleMoves()
+        this.totalTurns = totalTurns;
+        this.onlineTeam = onlineTeam;
+        this.getPossibleMoves();
     }
     clone() {
         return new Chessboard(this.pieces.map(piece => piece.clone()), this.totalTurns, this.moveList, this.onlineTeam);
