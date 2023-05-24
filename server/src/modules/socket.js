@@ -9,16 +9,17 @@ function gameServer (server) {
         }
     });
 
-    io.on("connection", socket => {
+    io.on("connection", async socket => {
         console.log(`Socket connected. Id: ${socket.id}`);
+        const room = await GameDB.read(`WHERE userOne = '${socket.id}' OR userTwo = '${socket.id}'`)
         socket.on("generate-room", async () => {
             try {
                 const room = generateRoom();
-                // const game = {
-                //     gameId: room,
-                //     userOne: socket.id
-                // }
-                // await GameDB.create(game);
+                const game = {
+                    gameId: room,
+                    userOne: socket.id,
+                }
+                await GameDB.create(game);
                 socket.join(room);
                 socket.emit("room-data", {room, team: "white"});
             } catch (err) {
@@ -29,22 +30,23 @@ function gameServer (server) {
         socket.on("join-room", async (room) => {
             const rooms = io.sockets.adapter.rooms;
             const hasRooms = rooms.has(room);
-            // const getGame = await GameDB.read(`WHERE gameId = '${room}'`)
-            if(!hasRooms) {
-                socket.emit('room-error', {success: false, message: "Room does not exit."}); 
+            const getGame = await GameDB.read(`WHERE gameId = '${room}'`)
+            if(!hasRooms || !getGame) {
+                socket.emit('room-success', {success: false, message: "Room does not exit."}); 
                 return; 
             }
             const roomSize = rooms.get(room).size;
             if(roomSize === 2) {
-                socket.emit('room-error', {success: false, message: "Room is already full."}); 
+                socket.emit('room-success', {success: false, message: "Room is full."}); 
                 return;
             }
-            // const game = {
-            //     userTwo: socket.id
-            // }
-            // await GameDB.update(game, `WHERE gameId = ${getGame.gameId}`);
+            const game = {
+                userTwo: socket.id,
+                isFull: true
+            }
+            await GameDB.update(game, `WHERE gameId = '${room}'`);
             socket.join(room);
-
+            socket.emit('room-success', {success: true}); 
             socket.emit("room-data", {room, team: "black"});
         });
         socket.on("check-room", room => {
@@ -56,15 +58,31 @@ function gameServer (server) {
             socket.emit("room-exists", rooms.has(room));
         })
 
-        socket.on("move", (move, room) => {
+        socket.on("move", async (move, room) => {
+            const gameUpdate = {
+                gamePieces: JSON.stringify(move.pieces),
+                moveList: JSON.stringify(move.moveList),
+                turns: move.totalTurns
+            }
+            await GameDB.update(gameUpdate, `WHERE gameId = '${room}'`);
             io.to(room).emit("opponent-move", move);
         });
+
+        socket.on("user-reconnected", async (room) => {
+            const res = await GameDB.read(`WHERE gameId = '${room}'`);
+            const game = res[0];
+            if(!game) return;
+            const gameData = {
+                pieces: game.gamepieces,
+                moveList: game.movelist,
+                totalTurns: game.turns
+            }
+            io.to(room).emit('reconnection-data', gameData);
+        })
         socket.on("disconnect", async () => {
             try {
-                const rooms = io.sockets.adapter.rooms;
-                //const currRoom = await GameDB.read(`WHERE userOne = '${socket.id}' OR userTwo = '${socket.id}'`);
-
-                rooms.delete(socket.id);
+                
+                
                 console.log(`${socket.id} disconnected`);
                 // if (!currRoom) return;
                 // if(socket.id === currRoom.userOne) {
