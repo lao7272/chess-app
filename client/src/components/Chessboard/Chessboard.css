@@ -5,4 +5,5 @@
     width: 31.25rem;
     height: 31.25rem;
     background: #ccc;
+    grid-area: c;
 }

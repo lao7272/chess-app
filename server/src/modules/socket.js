@@ -11,7 +11,6 @@ function gameServer (server) {
 
     io.on("connection", async socket => {
         console.log(`Socket connected. Id: ${socket.id}`);
-        const room = await GameDB.read(`WHERE userOne = '${socket.id}' OR userTwo = '${socket.id}'`)
         socket.on("generate-room", async () => {
             try {
                 const room = generateRoom();
@@ -30,7 +29,8 @@ function gameServer (server) {
         socket.on("join-room", async (room) => {
             const rooms = io.sockets.adapter.rooms;
             const hasRooms = rooms.has(room);
-            const getGame = await GameDB.read(`WHERE gameId = '${room}'`)
+            const res = await GameDB.read(`WHERE gameId = '${room}'`);
+            const getGame = res[0];
             if(!hasRooms || !getGame) {
                 socket.emit('room-success', {success: false, message: "Room does not exit."}); 
                 return; 
@@ -40,11 +40,21 @@ function gameServer (server) {
                 socket.emit('room-success', {success: false, message: "Room is full."}); 
                 return;
             }
-            const game = {
-                userTwo: socket.id,
-                isFull: true
+            
+            let game;
+            if(!getGame.userone) {
+                game = {
+                    userOne: socket.id,
+                    isFull: true
+                }
+            } else if (!getGame.usertwo) {
+                game = {
+                    userTwo: socket.id,
+                    isFull: true
+                }
             }
-            await GameDB.update(game, `WHERE gameId = '${room}'`);
+            const update = await GameDB.update(game, `WHERE gameId = '${room}'`);
+            console.log(update)
             socket.join(room);
             socket.emit('room-success', {success: true}); 
             socket.emit("room-data", {room, team: "black"});
@@ -81,17 +91,20 @@ function gameServer (server) {
         })
         socket.on("disconnect", async () => {
             try {
-                
-                
                 console.log(`${socket.id} disconnected`);
-                // if (!currRoom) return;
-                // if(socket.id === currRoom.userOne) {
-                //     await GameDB.update({userOne: null}, `userOne = ${socket.id}`)
-                // } else if (socket.id === currRoom.userTwo) {
-                //     await GameDB.update({userTwo: null}, `userTwo = ${socket.id}`)
-                // } else {
-
-                // }
+                const res = await GameDB.read(`WHERE userOne = '${socket.id}' OR userTwo = '${socket.id}'`)
+                const room = res[0];
+                if(!room) return;
+                if(socket.id === room.userone) {
+                    await GameDB.update({userone: null}, `WHERE userOne = '${socket.id}'`);
+                    console.log("User One Deleted");
+                } else if (socket.id === room.userTwo) {
+                    await GameDB.update({usertwo: null}, `WHERE userTwo = '${socket.id}'`);
+                    console.log("User Two Deleted");
+                } else if (!room.userone && !room.usertwo) {
+                    await GameDB.delete(`WHERE gameId = '${room}'`);
+                    console.log("Game deleted");
+                }
             } catch (err) {
                 console.error(err)
             }

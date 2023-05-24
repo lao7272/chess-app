@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import "./MoveList.css";
 import Move from '../Move/Move';
-export default function MoveList({moveList, chessboard}) {
+export default function MoveList({moveList, chessboard, room}) {
   const moveListRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +21,9 @@ export default function MoveList({moveList, chessboard}) {
             return <Move key={crypto.randomUUID()} pieces={pieces} moveIndex={i+1}/>
           })
         }
+      </div>
+      <div className="move-list-footer">
+        {room && <div className='room'><b>Room id:</b> {room}</div>}
       </div>
     </div>
   )

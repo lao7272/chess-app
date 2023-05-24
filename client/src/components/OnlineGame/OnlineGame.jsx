@@ -6,7 +6,6 @@ import { useLocation } from 'react-router-dom';
 export default function GameOnline({ socket }) {
     const {state} = useLocation();
     const [move, setMove] = useState(null);
-    const [isConnected, setIsConnected] = useState(true);
     const [opponentMove, setOpponentMove] = useState(null);
     useEffect(() => {
         socket.on("connect", () => {

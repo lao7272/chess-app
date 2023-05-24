@@ -9,6 +9,7 @@ export default class Chessboard {
         this.moveList = moveList;
         this.winningTeam = null;
         this.draw = false;
+        this.check = false;
     }
     get getCurrentTeam() {
         return this.totalTurns % 2 === 0 ? "black" : "white";
@@ -34,8 +35,8 @@ export default class Chessboard {
         // Castling
         king.possibleMoves = [...king.possibleMoves, ...king.castling(this.pieces)];
         // Checks the current team valid moves
-        this.getTeamDangerousMoves();
-
+        this.getTeamDangerousMoves(king);
+        this.check = this.isCheck(king);
         for (const piece of this.pieces) {
             if (piece.team !== currentTeam) {
                 piece.possibleMoves = [];
@@ -43,14 +44,14 @@ export default class Chessboard {
         }
         const getTeamPieces = this.pieces.filter(p => p.team === currentTeam);
         if (getTeamPieces.some(p => p.possibleMoves.length > 0)) return;
-        if (this.isKingChecked(king)) {
+        if (this.isCheck(king)) {
             this.winningTeam = this.getCurrentTeam === 'white' ? "black" : "white";
         } else {
             this.draw = true;
         }
     }
 
-    getTeamDangerousMoves() {
+    getTeamDangerousMoves(king) {
 
         for (const piece of this.pieces.filter(p => p.team === this.getCurrentTeam)) {
             for (const move of piece.possibleMoves) {
@@ -60,27 +61,30 @@ export default class Chessboard {
                 const clonedPiece = clonedBoard.pieces.find(p => p.samePosition(piece.position));
                 clonedPiece.position = move.clone();
                 const clonedKing = clonedBoard.pieces.find(p => p.isKing && p.team === clonedBoard.getCurrentTeam);
-                const filterTeamPieces = clonedBoard.pieces.filter(p => p.team !== clonedBoard.getCurrentTeam);
+                const opponentPieces = clonedBoard.pieces.filter(p => p.team !== clonedBoard.getCurrentTeam);
 
-                for (const enemy of filterTeamPieces) {
-                    enemy.possibleMoves = [];
-                    const newEnemy = clonedBoard.pieces.find(p => p.samePosition(enemy.position) && p.team !== clonedBoard.getCurrentTeam);
-                    enemy.possibleMoves = newEnemy.getPossibleMoves(clonedBoard.pieces);
-                    if (enemy.isPawn) {
-                        const isDangerousMove = enemy.possibleMoves.some(m => m.x !== enemy.position.x && m.samePosition(clonedKing.position));
+                for (const opponent of opponentPieces) {
+                    opponent.possibleMoves = [];
+                    
+                    const newOpponent = clonedBoard.pieces.find(p => p.samePosition(opponent.position) && p.team !== clonedBoard.getCurrentTeam);
+                    opponent.possibleMoves = newOpponent.getPossibleMoves(clonedBoard.pieces);
+                    
+                    if (opponent.isPawn) {
+                        const isDangerousMove = opponent.possibleMoves.some(m => m.x !== opponent.position.x && m.samePosition(clonedKing.position));
                         if (isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
                     } else {
-                        if (enemy.possibleMoves.some(m => m.samePosition(clonedKing.position))) {
+                        if (opponent.possibleMoves.some(m => m.samePosition(clonedKing.position))) {
                             piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
                         };
                     }
+                    
                 }
             }
         }
     }
-    isKingChecked(king) {
-        for (const enemy of this.pieces.filter(p => p.team !== this.getCurrentTeam)) {
-            const isChecked = enemy.getPossibleMoves(this.pieces).some(m => m.samePosition(king.position));
+    isCheck(king) {
+        for (const opponent of this.pieces.filter(p => p.team !== this.getCurrentTeam)) {
+            const isChecked = opponent.getPossibleMoves(this.pieces).some(m => m.samePosition(king.position));
             if (isChecked) return true;
         }
         return false;

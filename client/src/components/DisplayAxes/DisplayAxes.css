@@ -1,0 +1,38 @@
+.horizontal {
+    display: flex;
+}
+.horizontal > p {
+    color: #fff;
+    width: 62.5px;
+    text-align: center;
+}
+
+.vertical {
+    display: flex;
+    flex-direction: column;
+}
+.vertical > p {
+    color: #fff;
+    height: 62.5px;
+    display: flex;
+    align-items: center;
+}
+.v-a {
+    grid-area: v-a;
+}
+.v-b {
+    grid-area: v-b;
+}
+
+.h-a {
+    grid-area: h-a;
+}
+.h-b {
+    grid-area: h-b;
+}
+.v-reverse{
+    flex-direction: column-reverse;
+}
+.h-reverse{
+    flex-direction: row-reverse;
+}

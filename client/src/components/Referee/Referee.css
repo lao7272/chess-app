@@ -7,14 +7,13 @@
     width: 100%;
 }
 .chessboard-container{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
+    display: grid;
+    grid-template-areas: 
+    ". h-a ."
+    "v-a c v-b"
+    ". h-b .";
+    column-gap: 10px;
+    row-gap: 3px;
 }
-.room {
-    margin: 0;
-    font-size: 18px;
-    color: #fff;
-}
+
 

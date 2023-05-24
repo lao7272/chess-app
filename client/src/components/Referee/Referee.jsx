@@ -6,6 +6,7 @@ import MoveList from '../MoveList/MoveList';
 import { initialChessboard } from '../../Constants';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
+import DisplayAxis from '../DisplayAxes/DisplayAxes';
 
 export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
@@ -48,7 +49,13 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
             // MOVE LOGIC
             clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
             // MOVE NOTATION
-            moveNotation(prevPiecesLen, clonedChessboard.pieces.length, currentPiece, desiredPosition, clonedChessboard);
+            moveNotation(
+                prevPiecesLen, 
+                clonedChessboard.pieces.length, 
+                currentPiece, desiredPosition, 
+                clonedChessboard, 
+                clonedChessboard.check
+                );
             // CHECK IF IT IS A DRAW
             if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
             if(onlineTeam) setMove({
@@ -56,6 +63,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
                 moveList: clonedChessboard.moveList, 
                 totalTurns: clonedChessboard.totalTurns
             });
+            clonedChessboard.check = false;
             return clonedChessboard;
         });
         // SETS TEAM TURN
@@ -66,7 +74,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
         setMoveList(chessboard.moveList);
         
     }   
-    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard) {
+    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check) {
         const lastMove = chessboard.moveList ? chessboard.moveList[chessboard.moveList.length - 1] : undefined;
         const take = prevPiecesLen > currPiecesLength ? true : false;
         let castling = false;
@@ -79,7 +87,8 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
             prevPosition: piece.position,
             image: piece.image, 
             take, 
-            castling: castling
+            castling: castling,
+            check
         };
         
         if(!lastMove || lastMove.length === 2) {
@@ -152,13 +161,14 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     return (
         <>
             <main className='main-container'>
+                    
                 <div className='chessboard-container'>
-                    {room && <div className='room'><b>GameId</b>: {room}</div>}
+                    <DisplayAxis turn={turn}/>
                     <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
                     <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
                     <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
                 </div>
-                <MoveList moveList={moveList} chessboard={chessboard}/>
+                <MoveList moveList={moveList} chessboard={chessboard} room={room}/>
             </main>
         </>
     )
