@@ -8,7 +8,7 @@ export default class Chessboard {
         this.totalTurns = totalTurns;
         this.moveList = moveList;
         this.winningTeam = null;
-        this.draw = false;
+        this.draw = null;
         this.check = false;
     }
     get getCurrentTeam() {
@@ -16,6 +16,8 @@ export default class Chessboard {
     }
     getPossibleMoves() {
         if (this.onlineTeam && this.onlineTeam !== this.getCurrentTeam) {
+            const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam);
+            this.check = this.isCheck(king);
             for (const piece of this.pieces) {
                 if (piece.team !== this.onlineTeam) {
                     piece.possibleMoves = [];
@@ -65,10 +67,10 @@ export default class Chessboard {
 
                 for (const opponent of opponentPieces) {
                     opponent.possibleMoves = [];
-                    
+
                     const newOpponent = clonedBoard.pieces.find(p => p.samePosition(opponent.position) && p.team !== clonedBoard.getCurrentTeam);
                     opponent.possibleMoves = newOpponent.getPossibleMoves(clonedBoard.pieces);
-                    
+
                     if (opponent.isPawn) {
                         const isDangerousMove = opponent.possibleMoves.some(m => m.x !== opponent.position.x && m.samePosition(clonedKing.position));
                         if (isDangerousMove) piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
@@ -77,7 +79,7 @@ export default class Chessboard {
                             piece.possibleMoves = piece.possibleMoves.filter(m => !m.samePosition(move));
                         };
                     }
-                    
+
                 }
             }
         }
@@ -167,7 +169,7 @@ export default class Chessboard {
     addOnlineProperties(pieces, moveList, totalTurns, onlineTeam) {
         const newPieces = [];
         const newMoveList = [];
-        
+
         for (const piece of pieces) {
             switch (piece.type) {
                 case "pawn":
@@ -190,12 +192,12 @@ export default class Chessboard {
                     newPieces.push(new King(new Position(piece.position.x, piece.position.y), piece.team, piece.hasMoved));
                     break;
             }
-            
+
         }
-        
+
         for (const moveArray of moveList) {
             const newMoveArray = [];
-            for(const move of moveArray) {
+            for (const move of moveArray) {
                 const newMove = {
                     prevPosition: new Position(move.prevPosition.x, move.prevPosition.y),
                     position: new Position(move.position.x, move.position.y),

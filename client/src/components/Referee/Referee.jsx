@@ -18,6 +18,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     const checkmateRef = useRef(null);
 
     useEffect(() => {
+        if (chessboard.totalTurns === 1) setMoveList([]);
         if(onlineTeam) {
             if(chessboard.getCurrentTeam === onlineTeam) chessboard.getPossibleMoves();
         } else {
@@ -54,27 +55,32 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
                 clonedChessboard.pieces.length, 
                 currentPiece, desiredPosition, 
                 clonedChessboard, 
-                clonedChessboard.check
+                clonedChessboard.check,
+                clonedChessboard.winningTeam || clonedChessboard.draw,
+                clonedChessboard.winningTeam ? "#" : "="
                 );
-            // CHECK IF IT IS A DRAW
-            if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
-            if(onlineTeam) setMove({
-                pieces: clonedChessboard.pieces, 
-                moveList: clonedChessboard.moveList, 
-                totalTurns: clonedChessboard.totalTurns
-            });
-            clonedChessboard.check = false;
-            return clonedChessboard;
+                // SENDS GAME INFORMATION TO SERVER
+                if(onlineTeam) setMove({
+                    pieces: clonedChessboard.pieces, 
+                    moveList: clonedChessboard.moveList, 
+                    totalTurns: clonedChessboard.totalTurns
+                });
+                // CHECK IF IT IS A DRAW
+                if (clonedChessboard.winningTeam || clonedChessboard.draw) {
+                    checkmateRef.current.classList.remove("hidden");
+                };
+                clonedChessboard.check = false;
+                return clonedChessboard;
         });
+        // PAWN PROMOTION
+        checkPawnPromotion(currentPiece, desiredPosition);
         // SETS TEAM TURN
         const nextTurn = onlineTeam ? onlineTeam : turn === 'white' ? 'black' : 'white';
         setTurn(nextTurn);
-        // PAWN PROMOTION
-        checkPawnPromotion(currentPiece, desiredPosition);
         setMoveList(chessboard.moveList);
         
     }   
-    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check) {
+    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check, gameOver, gameOverSymbol) {
         const lastMove = chessboard.moveList ? chessboard.moveList[chessboard.moveList.length - 1] : undefined;
         const take = prevPiecesLen > currPiecesLength ? true : false;
         let castling = false;
@@ -87,8 +93,10 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
             prevPosition: piece.position,
             image: piece.image, 
             take, 
-            castling: castling,
-            check
+            castling,
+            check,
+            gameOver, 
+            gameOverSymbol
         };
         
         if(!lastMove || lastMove.length === 2) {
@@ -148,16 +156,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
         if (!pawnPromotion) return "white";
         return pawnPromotion.team === "white" ? "white" : "black";
     }
-    function restartGame() {
-        checkmateRef.current.classList.add("hidden");
-        setChessboard(() => {
-            const clonedChessboard = initialChessboard.clone();
-            initialChessboard.totalTurns = 1;
-            initialChessboard.moveList = [];
-            setMoveList([]);
-            return clonedChessboard;
-        });
-    }
+    
     return (
         <>
             <main className='main-container'>
@@ -166,7 +165,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
                     <DisplayAxis turn={turn}/>
                     <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
                     <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-                    <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} restartGame={restartGame}/>
+                    <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} setChessboard={setChessboard} setMoveList={setMoveList}/>
                 </div>
                 <MoveList moveList={moveList} chessboard={chessboard} room={room}/>
             </main>

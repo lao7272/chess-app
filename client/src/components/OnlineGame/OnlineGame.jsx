@@ -15,8 +15,8 @@ export default function GameOnline({ socket }) {
         socket.on("reconnection-data", (data) => {
             if(data.pieces === undefined || data.moveList === undefined || data.totalTurns === undefined ) return;
             setOpponentMove(data);
-        })
-    }, [])
+        });
+    }, []);
     
     useEffect(() => {        
         if (!socket) return;

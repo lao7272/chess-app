@@ -10,12 +10,12 @@ export default class Game extends Postgresql{
             const query = `
                 CREATE TABLE IF NOT EXISTS ${this.table} (
                     id SERIAL PRIMARY KEY,
-                    gameId VARCHAR(255),
-                    userOne VARCHAR(255),
-                    userTwo VARCHAR(255),
-                    isFull BOOLEAN,
-                    gamePieces JSON,
-                    moveList JSON,
+                    game_id VARCHAR(255),
+                    user_one VARCHAR(255),
+                    user_two VARCHAR(255),
+                    is_full BOOLEAN,
+                    game_pieces JSON,
+                    move_list JSON,
                     turns INT
             );
             `;
