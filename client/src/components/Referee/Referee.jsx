@@ -8,14 +8,14 @@ import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
 import DisplayAxis from '../DisplayAxes/DisplayAxes';
 
-export default function Referee({onlineTeam, room, setMove, opponentMove}) {
+export default function Referee({onlineTeam, room, setMove, opponentMove, setGameOverOnline, gameOverOnline}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
     const [moveList, setMoveList] = useState(chessboard.moveList);
     const [turn, setTurn] = useState(onlineTeam || "white");
+    const [gameOver, setGameOver] = useState(null);
 
     const promoteRef = useRef(null);
-    const checkmateRef = useRef(null);
 
     useEffect(() => {
         if (chessboard.totalTurns === 1) setMoveList([]);
@@ -27,14 +27,23 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     }, []);
 
     useEffect(() => {
+        if(gameOverOnline) {
+            setGameOver(gameOverOnline);
+            return;
+        }
         if(!opponentMove) return
         setChessboard(currChessBoard => {
             const clonedChessboard = currChessBoard.clone();
             clonedChessboard.addOnlineProperties(opponentMove.pieces, opponentMove.moveList, opponentMove.totalTurns, onlineTeam);
-            setMoveList(clonedChessboard.moveList)
+            setMoveList(clonedChessboard.moveList);
+            const teamPieces = clonedChessboard.pieces.filter(p => p.team !== onlineTeam);
+            if(teamPieces.some(p => p.possibleMoves.length > 0)) {
+                setGameOverOnline(clonedChessboard.gameOver);
+                setGameOver(clonedChessboard.gameOver);
+            };
             return clonedChessboard;
         });
-    }, [opponentMove])
+    }, [opponentMove, gameOverOnline])
     
     function playMove(currentPiece, desiredPosition) {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
@@ -56,20 +65,17 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
                 currentPiece, desiredPosition, 
                 clonedChessboard, 
                 clonedChessboard.check,
-                clonedChessboard.winningTeam || clonedChessboard.draw,
-                clonedChessboard.winningTeam ? "#" : "="
-                );
+                clonedChessboard.gameOver === null ? null : clonedChessboard.gameOver === 'draw' ? "=" : "#"
+            );
                 // SENDS GAME INFORMATION TO SERVER
                 if(onlineTeam) setMove({
                     pieces: clonedChessboard.pieces, 
                     moveList: clonedChessboard.moveList, 
                     totalTurns: clonedChessboard.totalTurns
                 });
-                // CHECK IF IT IS A DRAW
-                if (clonedChessboard.winningTeam || clonedChessboard.draw) {
-                    checkmateRef.current.classList.remove("hidden");
-                };
+                // CHECK GAME OVER
                 clonedChessboard.check = false;
+                if (clonedChessboard.gameOver) setGameOver(clonedChessboard.gameOver);
                 return clonedChessboard;
         });
         // PAWN PROMOTION
@@ -80,7 +86,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
         setMoveList(chessboard.moveList);
         
     }   
-    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check, gameOver, gameOverSymbol) {
+    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check, gameOverSymbol) {
         const lastMove = chessboard.moveList ? chessboard.moveList[chessboard.moveList.length - 1] : undefined;
         const take = prevPiecesLen > currPiecesLength ? true : false;
         let castling = false;
@@ -95,7 +101,6 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
             take, 
             castling,
             check,
-            gameOver, 
             gameOverSymbol
         };
         
@@ -146,7 +151,7 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
                 return result;
             }, []);
             clonedChessboard.getPossibleMoves();
-            if (clonedChessboard.winningTeam || clonedChessboard.draw) checkmateRef.current.classList.remove("hidden");
+            if (clonedChessboard.gameOver) setGameOver(clonedChessboard.gameOver);
             return clonedChessboard;
         });
         chessboard.getPossibleMoves();
@@ -160,12 +165,11 @@ export default function Referee({onlineTeam, room, setMove, opponentMove}) {
     return (
         <>
             <main className='main-container'>
-                    
                 <div className='chessboard-container'>
                     <DisplayAxis turn={turn}/>
                     <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
                     <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-                    <GameOver winningTeam={chessboard.winningTeam} checkmateRef={checkmateRef} setChessboard={setChessboard} setMoveList={setMoveList}/>
+                    {gameOver && <GameOver setGameOver={setGameOver} gameOver={gameOver} setChessboard={setChessboard} setMoveList={setMoveList} setTurn={setTurn}/>}
                 </div>
                 <MoveList moveList={moveList} chessboard={chessboard} room={room}/>
             </main>

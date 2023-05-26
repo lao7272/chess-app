@@ -38,10 +38,10 @@
     width: 25px;
 }
 .move-list > .move-list-footer{
-    height: 40px;
-}
-.move-list > .move-list-footer > .room{
-    text-align: center
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 35px;
 }
 .move-list > .move-list-footer > .room > b{
     font-size: 18px;

@@ -31,15 +31,9 @@ function gameServer (server) {
             const hasRooms = rooms.has(room);
             const res = await GameDB.read(`WHERE game_id = '${room}'`);
             const getGame = res[0];
-            if(!hasRooms || !getGame) {
-                socket.emit('room-success', {success: false, message: "Room does not exit."}); 
-                return; 
-            }
+            if(!hasRooms || !getGame) return;
             const roomSize = rooms.get(room).size;
-            if(roomSize === 2) {
-                socket.emit('room-success', {success: false, message: "Room is full."}); 
-                return;
-            }
+            if(roomSize === 2) return;
             
             let game;
             let team = "black"
@@ -56,9 +50,18 @@ function gameServer (server) {
                 }
             }
             await GameDB.update(game, `WHERE game_id = '${room}'`);
+
+            let gameData = null
+            if(getGame.turns > 1) {
+                gameData = {
+                    pieces: getGame.game_pieces || [],
+                    moveList: getGame.move_list || [],
+                    totalTurns: getGame.turns
+                }
+            }
             socket.join(room);
-            socket.emit('room-success', {success: true}); 
-            socket.emit("room-data", {room, team: team});
+            socket.emit("room-data", {room, team: team, gameData: gameData});
+            io.to(room).emit("room-status", true);
         });
         socket.on("check-room", room => {
             const rooms = io.sockets.adapter.rooms;
@@ -79,13 +82,17 @@ function gameServer (server) {
             io.to(room).emit("opponent-move", move);
         });
 
+        socket.on("game-over", ({gameOver, room}) => {
+            io.to(room).emit("game-over", gameOver)
+        })
+
         socket.on("user-reconnected", async (room) => {
             const res = await GameDB.read(`WHERE game_id = '${room}'`);
             const game = res[0];
             if(!game) return;
             const gameData = {
-                pieces: game.game_pieces,
-                moveList: game.move_list,
+                pieces: game.game_pieces || [],
+                moveList: game.move_list || [],
                 totalTurns: game.turns
             }
             io.to(room).emit('reconnection-data', gameData);
@@ -95,16 +102,16 @@ function gameServer (server) {
                 console.log(`${socket.id} disconnected`);
                 const res = await GameDB.read(`WHERE user_one = '${socket.id}' OR user_two = '${socket.id}'`)
                 const room = res[0];
-                const rooms = await GameDB.read();
-                rooms.forEach(r => {
-                    if(!r.user_one && !r.user_two) GameDB.delete(`WHERE game_id = '${r.game_id}'`);
+                const emptyRooms = await GameDB.read("WHERE user_one IS NULL AND user_two IS NULL");
+                emptyRooms.forEach(room => {
+                    GameDB.delete(`WHERE game_id = '${room.game_id}'`);
                 })
                 if(!room) return;
                 if(socket.id === room.user_one) {
-                    await GameDB.update({user_one: null}, `WHERE user_one = '${socket.id}'`);
+                    await GameDB.update({user_one: null, is_full: false}, `WHERE user_one = '${socket.id}'`);
                     console.log("User One Deleted");
                 } else if (socket.id === room.user_two) {
-                    await GameDB.update({user_two: null}, `WHERE user_two = '${socket.id}'`);
+                    await GameDB.update({user_two: null, is_full: false}, `WHERE user_two = '${socket.id}'`);
                     console.log("User Two Deleted");
                 } 
             } catch (err) {

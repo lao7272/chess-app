@@ -10,7 +10,7 @@ export default function Move({pieces, moveIndex} ) {
                     const pieceTakes = piece.type === "pawn" ? `${HORIZONTAL_AXIS[piece.prevPosition.x]} x ` : " x ";
                     const castlingText = piece.prevPosition.x - piece.position.x === -2 ? "O-O" : "O-O-O"; 
                     const moveText = `${piece.take ? pieceTakes : ""}${HORIZONTAL_AXIS[piece.position.x]} ${VERTICAL_AXIS[piece.position.y]}`
-                    const gameOver = piece.gameOver ? piece.gameOverSymbol : false;
+                    const gameOver = piece.gameOverSymbol ? piece.gameOverSymbol : false;
                     if(gameOver) {
                         return <div key={crypto.randomUUID()} className='move-items'>{gameOver}</div>
                     } else {

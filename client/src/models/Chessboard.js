@@ -7,9 +7,8 @@ export default class Chessboard {
         this.onlineTeam = onlineTeam;
         this.totalTurns = totalTurns;
         this.moveList = moveList;
-        this.winningTeam = null;
-        this.draw = null;
         this.check = false;
+        this.gameOver = null;
     }
     get getCurrentTeam() {
         return this.totalTurns % 2 === 0 ? "black" : "white";
@@ -19,14 +18,13 @@ export default class Chessboard {
             const king = this.pieces.find(p => p.isKing && p.team === this.getCurrentTeam);
             this.check = this.isCheck(king);
             for (const piece of this.pieces) {
-                if (piece.team !== this.onlineTeam) {
-                    piece.possibleMoves = [];
-                }
+                if (piece.team !== this.onlineTeam) piece.possibleMoves = [];
+                if (this.getCurrentTeam !== this.onlineTeam) piece.possibleMoves = [];
             }
-            return
+            return;
         }
         if (this.pieces.length === 2) {
-            this.draw = true;
+            this.gameOver = 'draw';
             return;
         }
         for (const piece of this.pieces) {
@@ -47,9 +45,9 @@ export default class Chessboard {
         const getTeamPieces = this.pieces.filter(p => p.team === currentTeam);
         if (getTeamPieces.some(p => p.possibleMoves.length > 0)) return;
         if (this.isCheck(king)) {
-            this.winningTeam = this.getCurrentTeam === 'white' ? "black" : "white";
+            this.gameOver = this.getCurrentTeam === 'white' ? "black" : "white";
         } else {
-            this.draw = true;
+            this.gameOver = "draw";
         }
     }
 
@@ -173,7 +171,6 @@ export default class Chessboard {
         for (const piece of pieces) {
             switch (piece.type) {
                 case "pawn":
-                    //piece.position.x, piece.position.y
                     newPieces.push(new Pawn(new Position(piece.position.x, piece.position.y), piece.team, piece.enPassant));
                     break;
                 case "bishop":

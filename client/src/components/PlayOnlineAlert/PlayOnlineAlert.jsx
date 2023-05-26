@@ -6,6 +6,7 @@ export default function PlayOnlineAlert({socket}) {
     const [roomExists, setRoomExists]= useState(false);
     const [room, setRoom] = useState(null);
     const [team, setTeam] = useState(null);
+    const [gameData, setGameData] = useState(null);
     const navigate = useNavigate();
     useEffect(() => {
         socket.emit("check-room", inputRoom);
@@ -18,7 +19,8 @@ export default function PlayOnlineAlert({socket}) {
         if(room) {
             navigate(`/game`, {state: {
                 room: room,
-                team: team
+                team: team,
+                gameData: gameData
             }});
         }
     }, [room]);
@@ -32,9 +34,10 @@ export default function PlayOnlineAlert({socket}) {
     function joinRoom(room) {
         if(room === "") return;
         socket.emit("join-room", room);
-        socket.on('room-data', ({room}) => {
-            setTeam("black");
+        socket.on('room-data', ({room, team, gameData}) => {
+            setTeam(team);
             setRoom(room);
+            setGameData(gameData);
         });
     }
     return (
