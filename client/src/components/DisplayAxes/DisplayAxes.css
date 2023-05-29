@@ -5,6 +5,7 @@
     color: #fff;
     width: 62.5px;
     text-align: center;
+    user-select: none;
 }
 
 .vertical {
@@ -16,6 +17,7 @@
     height: 62.5px;
     display: flex;
     align-items: center;
+    user-select: none;
 }
 .v-a {
     grid-area: v-a;

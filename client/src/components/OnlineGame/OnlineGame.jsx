@@ -8,6 +8,7 @@ export default function GameOnline({ socket }) {
     const [move, setMove] = useState(null);
     const [opponentMove, setOpponentMove] = useState(null);
     const [gameOverOnline, setGameOverOnline] = useState(null);
+    const [resign, setResign] = useState(null);
     useEffect(() => {
         socket.on("connect", () => {
             socket.emit("join-room", state.room);
@@ -27,7 +28,13 @@ export default function GameOnline({ socket }) {
         });
         socket.on('game-over', gameOver => {
             setGameOverOnline(gameOver)
-        })
+        });
+        socket.on('opponent-resigned', (team) => {
+            if(!team) return;
+            const resignedTeam = team === "white" ?  "black" : "white";
+            setGameOverOnline(resignedTeam);
+            setResign(true);
+        });
     }, [socket]);
     useEffect(() => {
         if(gameOverOnline) {
@@ -37,6 +44,19 @@ export default function GameOnline({ socket }) {
         if (!move) return
         socket.emit('move', move, state.room);
     }, [move, gameOverOnline]);
-    return <Referee onlineTeam={state.team} room={state.room} setMove={setMove} opponentMove={opponentMove} setGameOverOnline={setGameOverOnline} gameOverOnline={gameOverOnline}/>;
+    useEffect(() => {
+        if(!resign || gameOverOnline) return;
+        socket.emit("resign", {room: state.room, team: state.team});
+    },[resign])
+    return (<Referee 
+        onlineTeam={state.team} 
+        room={state.room} 
+        setMove={setMove} 
+        opponentMove={opponentMove} 
+        setGameOverOnline={setGameOverOnline} 
+        gameOverOnline={gameOverOnline}
+        setResign={setResign}
+        resign={resign}
+        />);
 
 }

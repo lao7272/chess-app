@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ChessBoard from '../Chessboard/Chessboard';
 import PromotionAlert from '../PromotionAlert/PromotionAlert';
-import GameOver from '../GameOver/GameOver';
+import GameOverAlert from '../GameOverAlert/GameOverAlert';
 import MoveList from '../MoveList/MoveList';
+import DisplayAxis from '../DisplayAxes/DisplayAxes';
 import { initialChessboard } from '../../Constants';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
-import DisplayAxis from '../DisplayAxes/DisplayAxes';
 
-export default function Referee({onlineTeam, room, setMove, opponentMove, setGameOverOnline, gameOverOnline}) {
+export default function Referee({onlineTeam, room, setMove, opponentMove, setGameOverOnline, gameOverOnline, setResign, resign}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
     const [moveList, setMoveList] = useState(chessboard.moveList);
@@ -18,7 +18,10 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
     const promoteRef = useRef(null);
 
     useEffect(() => {
-        if (chessboard.totalTurns === 1) setMoveList([]);
+        if (chessboard.totalTurns === 1) {
+            setMoveList([]);
+            chessboard.moveList = [];
+        };
         if(onlineTeam) {
             if(chessboard.getCurrentTeam === onlineTeam) chessboard.getPossibleMoves();
         } else {
@@ -29,6 +32,13 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
     useEffect(() => {
         if(gameOverOnline) {
             setGameOver(gameOverOnline);
+            setChessboard(currChessBoard => {
+                const clonedChessboard = currChessBoard.clone();
+                for (const piece of clonedChessboard.pieces) {
+                    piece.possibleMoves = [];
+                }
+                return clonedChessboard;
+            })
             return;
         }
         if(!opponentMove) return
@@ -120,7 +130,9 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
                 clonedCurrentPiece.position = desiredPosition.clone();
                 return prevPromotionPawn = clonedCurrentPiece;
             });
+
         }
+
     }
     function promotePawn(type) {
         if (!pawnPromotion) return;
@@ -152,9 +164,9 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
             }, []);
             clonedChessboard.getPossibleMoves();
             if (clonedChessboard.gameOver) setGameOver(clonedChessboard.gameOver);
+
             return clonedChessboard;
         });
-        chessboard.getPossibleMoves();
     }
 
     function setPromotionTeam() {
@@ -169,9 +181,19 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
                     <DisplayAxis turn={turn}/>
                     <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
                     <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-                    {gameOver && <GameOver setGameOver={setGameOver} gameOver={gameOver} setChessboard={setChessboard} setMoveList={setMoveList} setTurn={setTurn}/>}
+                    <GameOverAlert gameOver={gameOver} resign={resign}/>
                 </div>
-                <MoveList moveList={moveList} chessboard={chessboard} room={room}/>
+                <MoveList 
+                moveList={moveList} 
+                chessboard={chessboard} 
+                room={room} 
+                setChessboard={setChessboard} 
+                setGameOver={setGameOver} 
+                setMoveList={setMoveList} 
+                setTurn={setTurn} 
+                onlineTeam={onlineTeam}
+                setResign={setResign}
+                />
             </main>
         </>
     )

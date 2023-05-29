@@ -49,7 +49,7 @@ export default function PlayOnlineAlert({socket}) {
                     const value = e.target.value;
                     setInputRoom(value.trim())
                 }} type="text" id="room" placeholder="Enter room code"/> 
-                { roomExists ? <button className="play-btn play-btn-hover" onClick={() => joinRoom(inputRoom)}>Join</button> : <span className="play-btn play-btn-disabled">Join</span>}
+                { roomExists ? <button className="play-btn play-btn-hover" onClick={() => joinRoom(inputRoom)}>Join</button> : <button className="play-btn play-btn-disabled">Join</button>}
             </div>
         </div>
     )

@@ -1,0 +1,50 @@
+.checkmate-card-container{
+    width: 540px;
+    height: 540px;
+    position: absolute;
+}
+.checkmate-card {
+    width: 280px;
+    height: 40%;
+    background-color: #2e2e2e;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 3px;
+}
+.checkmate-card > .checkmate-close-alert {
+    background: none;
+    border: none;
+    color: #fff;
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.checkmate-card > .checkmate-close-alert:hover {
+    cursor: pointer;
+}
+.checkmate-card > .checkmate-card-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkmate-card > .checkmate-card-body > span {
+    border-bottom: 1.5px solid #fff;
+    font-weight: bold;
+    font-size: 30px;
+    margin: 20px;
+    text-transform: capitalize;
+}
+.checkmate-card > .checkmate-card-body > p {
+    text-transform: capitalize;
+}

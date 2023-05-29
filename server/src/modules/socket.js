@@ -81,9 +81,15 @@ function gameServer (server) {
             await GameDB.update(gameUpdate, `WHERE game_id = '${room}'`);
             io.to(room).emit("opponent-move", move);
         });
-
-        socket.on("game-over", ({gameOver, room}) => {
+        socket.on("game-over",  ({gameOver, room}) => {
             io.to(room).emit("game-over", gameOver)
+        })
+
+        socket.on("resign", ({room, team}) => {
+            io.to(room).emit("opponent-resigned", team);
+        })
+        socket.on("draw-offer", (room) => {
+            io.to(room).emit("")
         })
 
         socket.on("user-reconnected", async (room) => {

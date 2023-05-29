@@ -2,7 +2,10 @@ import React, { useEffect, useRef } from 'react';
 
 import "./MoveList.css";
 import Move from '../Move/Move';
-export default function MoveList({moveList, chessboard, room}) {
+import RestartButton from '../RestartButton/RestartButton';
+import ResignButton from '../ResignButton/ResignButton';
+import DrawButton from '../DrawButton/DrawButton';
+export default function MoveList({moveList, chessboard, room, setMoveList, setChessboard, setGameOver, setTurn, onlineTeam, setResign}) {
   const moveListRef = useRef(null);
 
   useEffect(() => {
@@ -23,7 +26,16 @@ export default function MoveList({moveList, chessboard, room}) {
         }
       </div>
       <div className="move-list-footer">
-        {room && <div className='room'><b>Room id:</b> {room}</div>}
+        <RestartButton setMoveList={setMoveList} setChessboard={setChessboard} setGameOver={setGameOver} setTurn={setTurn} room={room}/>
+        {room && 
+          <>
+            <div className='online-buttons'>
+              <ResignButton setResign={setResign}/>
+              <DrawButton/>
+            </div>
+            <div className='room'>{room}</div>
+          </>
+        }
       </div>
     </div>
   )

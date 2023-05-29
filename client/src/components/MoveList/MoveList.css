@@ -6,7 +6,7 @@
     height: 500px;
     width: 350px;
     color: white;
-    border-radius: 8px;
+    border-radius: 3px;
 }
 .move-list > .move-list-header {
     text-align: center;
@@ -15,7 +15,7 @@
 }
 .move-list-body {
     height: 445px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .move {
@@ -26,8 +26,8 @@
     justify-content: flex-start;
     gap: 5px;
     font-weight: 500;
-    border-bottom: 1px solid #000;
-    background-color: #3b3b3b;
+    border-bottom: 1px solid #1d1d1d;
+    background-color: #2e2e2e;
 }
 .move > .move-items {
     width: 100px;
@@ -38,12 +38,36 @@
     width: 25px;
 }
 .move-list > .move-list-footer{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 35px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    height: 40px;
+    color: #c7c7c7;
 }
-.move-list > .move-list-footer > .room > b{
-    font-size: 18px;
-    margin: 0 10px;
+.move-list > .move-list-footer > .online-buttons{
+    display: grid;
+    grid-column: 1 / 3;
+    grid-template-columns: repeat(2, 1fr);
+}
+.move-list > .move-list-footer  button{
+    border: none;
+    color: #c7c7c7;
+    background-color: #2a2a2a;
+    border: none;
+    padding: 5px;
+    border-right: 1px solid #333333;
+    border-left: 1px solid #333333;
+    font-size: 14px;
+}
+.move-list > .move-list-footer > .room {
+    font-size: 14px;
+    grid-column: 3 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.move-list > .move-list-footer button:hover {
+    background: #434343;
+    cursor: pointer;
+    transition: all .3s;
+    color: #fff;
 }
