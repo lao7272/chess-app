@@ -83,14 +83,39 @@ function gameServer (server) {
         });
         socket.on("game-over",  ({gameOver, room}) => {
             io.to(room).emit("game-over", gameOver)
-        })
+        });
 
         socket.on("resign", ({room, team}) => {
-            io.to(room).emit("opponent-resigned", team);
-        })
+            socket.broadcast.to(room).emit("opponent-resigned", team);
+        });
         socket.on("draw-offer", (room) => {
-            io.to(room).emit("")
-        })
+            socket.broadcast.to(room).emit("draw-offer-req");
+        });
+        socket.on("draw-offer-res", ({room, res}) => {
+            if(res) {
+                io.to(room).emit("game-over", "draw");
+            } else {
+                io.to(room).emit("draw-offer-declined");
+            }
+        });
+        socket.on("rematch-offer", (room) => {
+            socket.broadcast.to(room).emit("rematch-req");
+        });
+        socket.on("rematch-res",async ({room, team}) => {
+            const newRoom = generateRoom();
+            socket.broadcast.to(room).emit("rematch-accepted", newRoom);
+            const game = {
+                game_id: newRoom,
+            }
+            if(team === "white") {
+                game.user_one = socket.id
+            } else {
+                game.user_two = socket.id
+            }
+            await GameDB.create(game);
+            socket.join(newRoom);
+            socket.emit("room-data", {room: newRoom});
+        });
 
         socket.on("user-reconnected", async (room) => {
             const res = await GameDB.read(`WHERE game_id = '${room}'`);

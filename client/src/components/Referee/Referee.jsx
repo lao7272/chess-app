@@ -8,7 +8,24 @@ import { initialChessboard } from '../../Constants';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
 
-export default function Referee({onlineTeam, room, setMove, opponentMove, setGameOverOnline, gameOverOnline, setResign, resign}) {
+export default function Referee({
+    onlineTeam, 
+    room, 
+    setMove, 
+    opponentMove, 
+    setGameOverOnline, 
+    gameOverOnline, 
+    setResign, 
+    resign, 
+    setDrawOffer,
+    setDrawOfferReq,
+    setDrawOfferRes,
+    drawOfferReq,
+    setRematch,
+    setRematchReq,
+    rematchReq,
+    setRematchRes
+}) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
     const [moveList, setMoveList] = useState(chessboard.moveList);
@@ -193,6 +210,15 @@ export default function Referee({onlineTeam, room, setMove, opponentMove, setGam
                 setTurn={setTurn} 
                 onlineTeam={onlineTeam}
                 setResign={setResign}
+                setDrawOffer={setDrawOffer}
+                setDrawOfferReq={setDrawOfferReq}
+                drawOfferReq={drawOfferReq}
+                setDrawOfferRes={setDrawOfferRes}
+                gameOver={gameOver}
+                setRematch={setRematch}
+                setRematchReq={setRematchReq}
+                rematchReq={rematchReq}
+                setRematchRes={setRematchRes}
                 />
             </main>
         </>

@@ -38,12 +38,16 @@
     width: 25px;
 }
 .move-list > .move-list-footer{
+    color: #c7c7c7;
+    height: 40px;
+}
+.move-list > .move-list-footer > .move-list-footer-online {
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    height: 40px;
-    color: #c7c7c7;
 }
-.move-list > .move-list-footer > .online-buttons{
+.move-list > .move-list-footer > .move-list-footer-online > .online-buttons{
     display: grid;
     grid-column: 1 / 3;
     grid-template-columns: repeat(2, 1fr);
@@ -58,7 +62,7 @@
     border-left: 1px solid #333333;
     font-size: 14px;
 }
-.move-list > .move-list-footer > .room {
+.move-list > .move-list-footer > .move-list-footer-online > .room {
     font-size: 14px;
     grid-column: 3 / -1;
     display: flex;
@@ -70,4 +74,46 @@
     cursor: pointer;
     transition: all .3s;
     color: #fff;
+}
+.confirm-alert {
+    background-color: #2a2a2a;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 0;
+    position: absolute;
+}
+
+.confirm-alert > .confirm-buttons button {
+    padding: 0 20px;
+}
+
+.offer-alert{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 20%;
+    width: 100%;
+    padding-bottom: 15px;
+}
+.offer-alert > h4 {
+    margin: 10px;
+}
+.offer-alert > .offer-alert-buttons > button {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: none;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #597750;
+    color: #fff;
+}
+.offer-alert > .offer-alert-buttons > button:hover {
+    cursor: pointer;
+    background-color: #75a068;
+    transition: all .3s ease-in-out; 
 }

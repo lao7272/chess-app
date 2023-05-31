@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { initialChessboard } from '../../Constants';
 import "./RestartButton.css";
 
-export default function RestartButton({ setMoveList, setTurn, setGameOver, setChessboard, room, gameOver}) {
+export default function RestartButton({ setMoveList, setTurn, setGameOver, setChessboard, room}) {
     const buttonRef = useRef(null);
-    if(room && buttonRef.current) buttonRef.current.classList.add("online-culumn-position", "hidden");
+    if(room && buttonRef.current) buttonRef.current.classList.add("hidden");
 
     function restartGame() {
         setGameOver(null);

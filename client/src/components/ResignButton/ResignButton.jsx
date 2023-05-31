@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './ResignButton.css';
 
 export default function ResignButton({setResign}) {
     const [clickResign, setClickResign] = useState(false);
@@ -10,9 +9,9 @@ export default function ResignButton({setResign}) {
     return (
         <>
             {clickResign && 
-                <div className='confirmResign'>
+                <div className='confirm-alert'>
                     <p>Are you sure you want to resign?</p>
-                    <div className='confirmResignButton'>
+                    <div className='confirm-buttons'>
                         <button onClick={() => onResign()}>Yes</button><button onClick={() => setClickResign(false)}>No</button>
                     </div>
                 </div>

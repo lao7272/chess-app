@@ -6,9 +6,7 @@
     right: 0px;
     left: 0px;
 }
-.hidden {
-    display: none;
-}
+
 .card > .card-body {
     display: flex;
     align-items: center;
