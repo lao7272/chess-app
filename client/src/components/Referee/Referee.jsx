@@ -24,7 +24,8 @@ export default function Referee({
     setRematch,
     setRematchReq,
     rematchReq,
-    setRematchRes
+    setRematchRes,
+    state
 }) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
     const [pawnPromotion, setpawnPromotion] = useState();
@@ -55,8 +56,9 @@ export default function Referee({
                     piece.possibleMoves = [];
                 }
                 return clonedChessboard;
-            })
+            });
             return;
+
         }
         if(!opponentMove) return
         setChessboard(currChessBoard => {
@@ -70,7 +72,21 @@ export default function Referee({
             };
             return clonedChessboard;
         });
-    }, [opponentMove, gameOverOnline])
+    }, [opponentMove, gameOverOnline]);
+    useEffect(() => {
+        if(!state.rematch) return;
+        setGameOver(null);
+        setTurn(onlineTeam);
+        setChessboard(() => {
+            const clonedChessboard = initialChessboard.clone();
+            initialChessboard.totalTurns = 1;
+            initialChessboard.moveList = [];
+            setMoveList([]);
+            clonedChessboard.getPossibleMoves();
+            return clonedChessboard;
+        });
+        return;
+    }, [state]);
     
     function playMove(currentPiece, desiredPosition) {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
@@ -95,7 +111,7 @@ export default function Referee({
                 clonedChessboard.gameOver === null ? null : clonedChessboard.gameOver === 'draw' ? "=" : "#"
             );
                 // SENDS GAME INFORMATION TO SERVER
-                if(onlineTeam) setMove({
+                if(room) setMove({
                     pieces: clonedChessboard.pieces, 
                     moveList: clonedChessboard.moveList, 
                     totalTurns: clonedChessboard.totalTurns

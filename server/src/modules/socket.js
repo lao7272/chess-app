@@ -28,10 +28,10 @@ function gameServer (server) {
     
         socket.on("join-room", async (room) => {
             const rooms = io.sockets.adapter.rooms;
-            const hasRooms = rooms.has(room);
+            const hasRoom = rooms.has(room);
             const res = await GameDB.read(`WHERE game_id = '${room}'`);
             const getGame = res[0];
-            if(!hasRooms || !getGame) return;
+            if(!hasRoom || !getGame) return;
             const roomSize = rooms.get(room).size;
             if(roomSize === 2) return;
             
@@ -103,16 +103,15 @@ function gameServer (server) {
         });
         socket.on("rematch-res",async ({room, team}) => {
             const newRoom = generateRoom();
-            socket.broadcast.to(room).emit("rematch-accepted", newRoom);
-            const game = {
-                game_id: newRoom,
-            }
+            const game = {game_id: newRoom}
             if(team === "white") {
                 game.user_one = socket.id
             } else {
                 game.user_two = socket.id
             }
             await GameDB.create(game);
+            socket.broadcast.to(room).emit("rematch-accepted", newRoom);
+            socket.leave(room);
             socket.join(newRoom);
             socket.emit("room-data", {room: newRoom});
         });

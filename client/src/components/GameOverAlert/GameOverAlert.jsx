@@ -1,11 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import "./GameOverAlert.css";
 
 export default function GameOver({gameOver, resign}) {
     const alertRef = useRef(null);
     const isDraw = gameOver === 'draw' ? <span>{gameOver}</span> : <span>{gameOver} team won</span>;
     const teamResigned = gameOver === "white" ?  "black" : "white";
-    if(gameOver) alertRef.current.classList.remove("hidden");
+    useEffect(() => {
+        if(!gameOver) return;
+        alertRef.current.classList.remove("hidden");
+    }, [gameOver]) 
     function closeAlert() {
         alertRef.current.classList.add("hidden");
     }

@@ -16,8 +16,7 @@ export default function RestartButton({ setMoveList, setTurn, setGameOver, setCh
             setTurn("white");
             clonedChessboard.getPossibleMoves();
             return clonedChessboard;
-        });
-        if(!room) return;
+        })
         
     }
     return <button ref={buttonRef} className='restart-button' onClick={restartGame}>Play again</button> 
