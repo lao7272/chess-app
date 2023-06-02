@@ -33,7 +33,7 @@ export default function MoveList({
     if (moveListRef && moveListRef.current.lastChild) {
       moveListRef.current.lastChild.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chessboard, gameOver]);
+  }, [chessboard, gameOver, moveList]);
   return (
     <div className='move-list'>
       <div className='move-list-header'>

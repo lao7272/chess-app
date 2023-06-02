@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 20px;
     width: 100%;
 }
@@ -14,9 +15,6 @@
     ". h-b .";
     column-gap: 10px;
     row-gap: 3px;
-}
-.relative {
-    position: relative;
 }
 
 

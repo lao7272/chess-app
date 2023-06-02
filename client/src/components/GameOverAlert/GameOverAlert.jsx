@@ -3,8 +3,9 @@ import "./GameOverAlert.css";
 
 export default function GameOver({gameOver, resign}) {
     const alertRef = useRef(null);
-    const isDraw = gameOver === 'draw' ? <span>{gameOver}</span> : <span>{gameOver} team won</span>;
-    const teamResigned = gameOver === "white" ?  "black" : "white";
+    const teamResigned = gameOver === "white" ?  "Black Team Resigned" : "White Team Resigned";
+    const gameOverInfo = resign ? <p>{teamResigned}</p> : <p>Checkmate!</p>
+    const isDraw = gameOver === 'draw' ? <span>{gameOver}</span> : <><span>{gameOver} team won</span> {gameOverInfo}</>;
     useEffect(() => {
         if(!gameOver) return;
         alertRef.current.classList.remove("hidden");
@@ -19,7 +20,6 @@ export default function GameOver({gameOver, resign}) {
                 <button onClick={e => closeAlert()} className='checkmate-close-alert'>&times;</button>
                 <div className='checkmate-card-body'>
                     {isDraw}
-                    {resign && <p>{teamResigned} Team Resigned</p>}
                 </div>
             </div>
         </div>

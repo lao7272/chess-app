@@ -9,14 +9,14 @@ import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
 
 export default function Referee({
-    onlineTeam, 
-    room, 
-    setMove, 
-    opponentMove, 
-    setGameOverOnline, 
-    gameOverOnline, 
-    setResign, 
-    resign, 
+    onlineTeam,
+    room,
+    setMove,
+    opponentMove,
+    setGameOverOnline,
+    gameOverOnline,
+    setResign,
+    resign,
     setDrawOffer,
     setDrawOfferReq,
     setDrawOfferRes,
@@ -28,9 +28,13 @@ export default function Referee({
     state
 }) {
     const [chessboard, setChessboard] = useState(initialChessboard.clone());
-    const [pawnPromotion, setpawnPromotion] = useState();
+    const [currPiece, setCurrPiece] = useState(null);
+    const [grabPosition, setGrabPosition] = useState(null);
+    const [pawnPromotion, setPawnPromotion] = useState(null);
     const [moveList, setMoveList] = useState(chessboard.moveList);
+    const [prevPiecesLen, setPrevPiecesLen] = useState(initialChessboard.pieces.length);
     const [turn, setTurn] = useState(onlineTeam || "white");
+    const [check, setCheck] = useState(false);
     const [gameOver, setGameOver] = useState(null);
 
     const promoteRef = useRef(null);
@@ -40,15 +44,15 @@ export default function Referee({
             setMoveList([]);
             chessboard.moveList = [];
         };
-        if(onlineTeam) {
-            if(chessboard.getCurrentTeam === onlineTeam) chessboard.getPossibleMoves();
+        if (onlineTeam) {
+            if (chessboard.getCurrentTeam === onlineTeam) chessboard.getPossibleMoves();
         } else {
             chessboard.getPossibleMoves();
         }
     }, []);
 
     useEffect(() => {
-        if(gameOverOnline) {
+        if (gameOverOnline) {
             setGameOver(gameOverOnline);
             setChessboard(currChessBoard => {
                 const clonedChessboard = currChessBoard.clone();
@@ -60,13 +64,13 @@ export default function Referee({
             return;
 
         }
-        if(!opponentMove) return
+        if (!opponentMove) return
         setChessboard(currChessBoard => {
             const clonedChessboard = currChessBoard.clone();
             clonedChessboard.addOnlineProperties(opponentMove.pieces, opponentMove.moveList, opponentMove.totalTurns, onlineTeam);
             setMoveList(clonedChessboard.moveList);
             const teamPieces = clonedChessboard.pieces.filter(p => p.team !== onlineTeam);
-            if(teamPieces.some(p => p.possibleMoves.length > 0)) {
+            if (teamPieces.some(p => p.possibleMoves.length > 0)) {
                 setGameOverOnline(clonedChessboard.gameOver);
                 setGameOver(clonedChessboard.gameOver);
             };
@@ -74,7 +78,7 @@ export default function Referee({
         });
     }, [opponentMove, gameOverOnline]);
     useEffect(() => {
-        if(!state.rematch) return;
+        if (!state || !state.rematch) return;
         setGameOver(null);
         setTurn(onlineTeam);
         setChessboard(() => {
@@ -87,7 +91,38 @@ export default function Referee({
         });
         return;
     }, [state]);
-    
+    useEffect(() => {
+        if(chessboard.totalTurns === 1) return;
+        if(!currPiece) return;
+        // PAWN PROMOTION
+        const isPromoting = checkPawnPromotion(currPiece, grabPosition);
+        if(isPromoting) return;
+        // MOVE NOTATION
+        moveNotation(
+            prevPiecesLen,
+            chessboard.pieces.length,
+            currPiece, 
+            grabPosition,
+            chessboard,
+            pawnPromotion,
+            check,
+            chessboard.gameOver === null ? null : chessboard.gameOver === 'draw' ? "=" : "#"
+        );
+        // SETS TEAM TURN
+        const nextTurn = onlineTeam ? onlineTeam : turn === 'white' ? 'black' : 'white';
+        setTurn(nextTurn);
+        setMoveList(chessboard.moveList);
+        setCheck(false);
+        setPawnPromotion(false);
+        if (chessboard.gameOver) setGameOver(chessboard.gameOver);
+        // SENDS GAME INFORMATION TO SERVER
+        if(room) setMove({
+            pieces: chessboard.pieces,
+            totalTurns: chessboard.totalTurns,
+            moveList: chessboard.moveList
+        })
+        setCurrPiece(null);
+    }, [chessboard]);
     function playMove(currentPiece, desiredPosition) {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
         if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;
@@ -97,75 +132,60 @@ export default function Referee({
         // Playmove modifies the board, therefore, the chessboard is updated
         setChessboard(() => {
             const clonedChessboard = chessboard.clone();
-            const prevPiecesLen = clonedChessboard.pieces.length;
+            setPrevPiecesLen(clonedChessboard.pieces.length);
             clonedChessboard.totalTurns++;
             // MOVE LOGIC
-            clonedChessboard.playMove(currentPiece, desiredPosition, validMove); 
-            // MOVE NOTATION
-            moveNotation(
-                prevPiecesLen, 
-                clonedChessboard.pieces.length, 
-                currentPiece, desiredPosition, 
-                clonedChessboard, 
-                clonedChessboard.check,
-                clonedChessboard.gameOver === null ? null : clonedChessboard.gameOver === 'draw' ? "=" : "#"
-            );
-                // SENDS GAME INFORMATION TO SERVER
-                if(room) setMove({
-                    pieces: clonedChessboard.pieces, 
-                    moveList: clonedChessboard.moveList, 
-                    totalTurns: clonedChessboard.totalTurns
-                });
-                // CHECK GAME OVER
-                clonedChessboard.check = false;
-                if (clonedChessboard.gameOver) setGameOver(clonedChessboard.gameOver);
-                return clonedChessboard;
+            clonedChessboard.playMove(currentPiece, desiredPosition, validMove);
+            setCurrPiece(currentPiece);
+            setGrabPosition(desiredPosition);
+            setCheck(clonedChessboard.check);
+            clonedChessboard.check = false;            
+            return clonedChessboard;
         });
-        // PAWN PROMOTION
-        checkPawnPromotion(currentPiece, desiredPosition);
-        // SETS TEAM TURN
-        const nextTurn = onlineTeam ? onlineTeam : turn === 'white' ? 'black' : 'white';
-        setTurn(nextTurn);
-        setMoveList(chessboard.moveList);
+
         
-    }   
-    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, check, gameOverSymbol) {
+
+    }
+    function moveNotation(prevPiecesLen, currPiecesLength, piece, desiredPosition, chessboard, isPromotion, check, gameOverSymbol) {
         const lastMove = chessboard.moveList ? chessboard.moveList[chessboard.moveList.length - 1] : undefined;
         const take = prevPiecesLen > currPiecesLength ? true : false;
         let castling = false;
-        if(piece.isKing && (piece.position.x - desiredPosition.x === 2 || piece.position.x - desiredPosition.x === -2)) {
+        const promotion = isPromotion ? true : false;
+        if (piece.isKing && (piece.position.x - desiredPosition.x === 2 || piece.position.x - desiredPosition.x === -2)) {
             castling = true;
         }
         const move = {
-            type: piece.type, 
-            position: desiredPosition, 
+            type: piece.type,
+            position: desiredPosition,
             prevPosition: piece.position,
-            image: piece.image, 
-            take, 
+            image: piece.image,
+            take,
             castling,
+            promotion, 
             check,
             gameOverSymbol
         };
-        
-        if(!lastMove || lastMove.length === 2) {
+
+        if (!lastMove || lastMove.length === 2) {
             chessboard.moveList.push([move]);
-        } else if(lastMove.length < 2) {
+        } else if (lastMove.length < 2) {
             chessboard.moveList[chessboard.moveList.length - 1].push(move);
         }
     }
-    function checkPawnPromotion (piece, desiredPosition ) {
+    function checkPawnPromotion(piece, desiredPosition) {
+        if(!piece) return false;
         const promotion = piece.team === "white" ? 7 : 0;
 
-        if (desiredPosition.y === promotion && piece.isPawn) {
+        if (desiredPosition.y === promotion && piece.isPawn){
             promoteRef.current.classList.remove("hidden");
-            setpawnPromotion(prevPromotionPawn => {
+            setPawnPromotion(prevPromotionPawn => {
                 const clonedCurrentPiece = piece.clone()
                 clonedCurrentPiece.position = desiredPosition.clone();
                 return prevPromotionPawn = clonedCurrentPiece;
             });
-
+            return true;
         }
-
+        return false;
     }
     function promotePawn(type) {
         if (!pawnPromotion) return;
@@ -173,19 +193,28 @@ export default function Referee({
         setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.pieces = clonedChessboard.pieces.reduce((result, piece) => {
-                if (piece.samePosition(pawnPromotion.position)) { 
-                    switch(type) {
+                if (piece.samePosition(pawnPromotion.position)) {
+                    let newPiece;
+                    switch (type) {
                         case "queen":
-                            result.push(new Queen(piece.position.clone(), piece.team));
+                            newPiece = new Queen(piece.position.clone(), piece.team);
+                            result.push(newPiece);
+                            setCurrPiece(newPiece);
                             break;
                         case "knight":
-                            result.push(new Knight(piece.position.clone(), piece.team));
+                            newPiece = new Knight(piece.position.clone(), piece.team);
+                            result.push(newPiece);
+                            setCurrPiece(newPiece);
                             break;
                         case "bishop":
-                            result.push(new Bishop(piece.position.clone(), piece.team));
+                            newPiece = new Bishop(piece.position.clone(), piece.team);
+                            result.push(newPiece);
+                            setCurrPiece(newPiece)
                             break;
                         case "rook":
-                            result.push(new Rook(piece.position.clone(), piece.team, true));
+                            newPiece = new Rook(piece.position.clone(), piece.team, true);
+                            result.push(newPiece);
+                            setCurrPiece(newPiece);
                             break;
                         default:
                             break;
@@ -196,8 +225,6 @@ export default function Referee({
                 return result;
             }, []);
             clonedChessboard.getPossibleMoves();
-            if (clonedChessboard.gameOver) setGameOver(clonedChessboard.gameOver);
-
             return clonedChessboard;
         });
     }
@@ -206,35 +233,35 @@ export default function Referee({
         if (!pawnPromotion) return "white";
         return pawnPromotion.team === "white" ? "white" : "black";
     }
-    
+
     return (
         <>
             <main className='main-container'>
                 <div className='chessboard-container'>
-                    <DisplayAxis turn={turn}/>
-                    <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn}/>
-                    <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef}/>
-                    <GameOverAlert gameOver={gameOver} resign={resign}/>
+                    <DisplayAxis turn={turn} />
+                    <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn} />
+                    <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef} />
+                    <GameOverAlert gameOver={gameOver} resign={resign} />
                 </div>
-                <MoveList 
-                moveList={moveList} 
-                chessboard={chessboard} 
-                room={room} 
-                setChessboard={setChessboard} 
-                setGameOver={setGameOver} 
-                setMoveList={setMoveList} 
-                setTurn={setTurn} 
-                onlineTeam={onlineTeam}
-                setResign={setResign}
-                setDrawOffer={setDrawOffer}
-                setDrawOfferReq={setDrawOfferReq}
-                drawOfferReq={drawOfferReq}
-                setDrawOfferRes={setDrawOfferRes}
-                gameOver={gameOver}
-                setRematch={setRematch}
-                setRematchReq={setRematchReq}
-                rematchReq={rematchReq}
-                setRematchRes={setRematchRes}
+                <MoveList
+                    moveList={moveList}
+                    chessboard={chessboard}
+                    room={room}
+                    setChessboard={setChessboard}
+                    setGameOver={setGameOver}
+                    setMoveList={setMoveList}
+                    setTurn={setTurn}
+                    onlineTeam={onlineTeam}
+                    setResign={setResign}
+                    setDrawOffer={setDrawOffer}
+                    setDrawOfferReq={setDrawOfferReq}
+                    drawOfferReq={drawOfferReq}
+                    setDrawOfferRes={setDrawOfferRes}
+                    gameOver={gameOver}
+                    setRematch={setRematch}
+                    setRematchReq={setRematchReq}
+                    rematchReq={rematchReq}
+                    setRematchRes={setRematchRes}
                 />
             </main>
         </>

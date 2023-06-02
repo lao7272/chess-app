@@ -79,7 +79,7 @@ function gameServer (server) {
                 turns: move.totalTurns
             }
             await GameDB.update(gameUpdate, `WHERE game_id = '${room}'`);
-            io.to(room).emit("opponent-move", move);
+            socket.broadcast.to(room).emit("opponent-move", move);
         });
         socket.on("game-over",  ({gameOver, room}) => {
             io.to(room).emit("game-over", gameOver)
