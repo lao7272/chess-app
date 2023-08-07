@@ -31,7 +31,9 @@ export default function MoveList({
 
   useEffect(() => {
     if (moveListRef && moveListRef.current.lastChild) {
-      moveListRef.current.lastChild.scrollIntoView({ behavior: 'smooth' });
+      const lastChild = moveListRef.current.lastChild;
+      const lastChildHeight = lastChild.offsetTop;
+      moveListRef.current.scrollTop = lastChildHeight;
     }
   }, [chessboard, gameOver, moveList]);
   return (

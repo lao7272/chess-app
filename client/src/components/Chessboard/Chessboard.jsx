@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import './Chessboard.css';
-import Tile from '../Tile/Tile';
+import Square from '../Square/Square';
 import { VERTICAL_AXIS, HORIZONTAL_AXIS, GRID_SIZE } from '../../Constants';
 import { Position } from '../../models';
 
@@ -18,7 +18,6 @@ export default function Chessboard({ playMove, pieces, turn }) {
             const grabX = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - 500) / GRID_SIZE));
             const grabY = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 500) / GRID_SIZE)) : Math.floor((e.clientY - chessboard.offsetTop) / GRID_SIZE);
             setGrabPosition({ x: grabX, y: grabY });
-
             const x = e.clientX - GRID_SIZE / 2;
             const y = e.clientY - GRID_SIZE / 2;
             element.style.position = "absolute";
@@ -93,7 +92,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
                 const currentPiece = pieces.find(p => p.samePosition(grabPosition));
                 let highlight;
                 if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => p.samePosition({ x: j, y: i })) : false;
-                board.push(<Tile key={`${j}${i}`} number={number} image={image} highlight={highlight} />);
+                board.push(<Square key={`${j}${i}`} number={number} image={image} highlight={highlight} />);
                 
             }
         }
@@ -106,7 +105,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
                 const currentPiece = pieces.find(p => p.samePosition(grabPosition));
                 let highlight;
                 if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => p.samePosition({ x: j, y: i })) : false;
-                board.push(<Tile key={`${i}${j}`} number={number} image={image} highlight={highlight} />);
+                board.push(<Square key={`${i}${j}`} number={number} image={image} highlight={highlight} />);
             }
         }
     }

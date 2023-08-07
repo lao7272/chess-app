@@ -31,13 +31,13 @@
     width: 18px;
     height: 18px;
     border-radius: 99%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 .highlighted-tile.chess-piece-tile::before {
     position: absolute;
     content: ' ';
     width: 53.5px;
     height: 53.5px;
-    border: 4px solid rgba(0, 0, 0, 0.4);
+    border: 4px solid rgba(0, 0, 0, 0.2);
     border-radius: 99%;
 }

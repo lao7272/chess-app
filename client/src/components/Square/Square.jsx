@@ -1,5 +1,5 @@
 import React from 'react';
-import "./Tile.css";
+import "./Square.css";
 
 export default function ({number, image, highlight}) {
     const className = [

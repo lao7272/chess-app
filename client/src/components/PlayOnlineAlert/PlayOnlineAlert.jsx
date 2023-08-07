@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./PlayOnlineAlert.css";
 import { useNavigate } from "react-router-dom";
-export default function PlayOnlineAlert({socket}) {
+export default function PlayOnlineAlert({socket, playOnline}) {
     const [inputRoom, setInputRoom] = useState("");
     const [roomExists, setRoomExists]= useState(false);
     const [room, setRoom] = useState(null);
     const [team, setTeam] = useState(null);
     const [gameData, setGameData] = useState(null);
     const navigate = useNavigate();
+    const containerRef = useRef(null)
     useEffect(() => {
         socket.emit("check-room", inputRoom);
         socket.on("room-exists", exists => setRoomExists(exists));
@@ -24,6 +25,16 @@ export default function PlayOnlineAlert({socket}) {
             }});
         }
     }, [room]);
+    useEffect(() => {
+        if(!containerRef.current) return;
+        if(playOnline) {
+            containerRef.current.classList.add("show");
+            containerRef.current.classList.remove("hidden");
+        } else { 
+            containerRef.current.classList.add("hidden");
+            containerRef.current.classList.remove("show");
+        }
+    }, [playOnline]);
     function generateRoom() {
         socket.emit("generate-room");
         socket.on('room-data', ({room}) => {
@@ -41,7 +52,7 @@ export default function PlayOnlineAlert({socket}) {
         });
     }
     return (
-        <div className="play-alert">
+        <div ref={containerRef} className="play-alert hidden">
             <button  onClick={() => generateRoom()} className="play-btn play-btn-hover">Create Room</button>
             <div className="play-input-container">
                 <label htmlFor="room">Join Room</label>

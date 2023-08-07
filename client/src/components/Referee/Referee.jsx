@@ -178,6 +178,7 @@ export default function Referee({
 
         if (desiredPosition.y === promotion && piece.isPawn){
             promoteRef.current.classList.remove("hidden");
+            promoteRef.current.classList.add("show");
             setPawnPromotion(prevPromotionPawn => {
                 const clonedCurrentPiece = piece.clone()
                 clonedCurrentPiece.position = desiredPosition.clone();
@@ -190,6 +191,7 @@ export default function Referee({
     function promotePawn(type) {
         if (!pawnPromotion) return;
         promoteRef.current.classList.add('hidden');
+        promoteRef.current.classList.remove("show");
         setChessboard(() => {
             const clonedChessboard = chessboard.clone();
             clonedChessboard.pieces = clonedChessboard.pieces.reduce((result, piece) => {
