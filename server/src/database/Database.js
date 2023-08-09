@@ -1,25 +1,24 @@
 import pg from "pg";
 import config from "../config/config.js";
-const { Pool } = pg;
-const { DATABASE_PASSWORD,DATABASE_HOST, DATABASE_USER, DATABASE_PORT } = config;
+const { Client } = pg;
+const { DATABASE_URL } = config;
 export default class Postgresql {
     constructor(table) {
-        this.pool = new Pool({
-            user: DATABASE_USER,
-            host: DATABASE_HOST,
-            database: 'postgres',
-            password: DATABASE_PASSWORD,
-            port: DATABASE_PORT,
-        });
+        this.client = new Client(DATABASE_URL);
         this.table = table;
+        this.connect();
     }
-    
+    async connect() {
+        this.client.connect((err) => {
+            if (err) return console.error('could not connect to postgres', err);
+        });
+    }
     async create(object) {
         try {
             const columns = Object.keys(object).join(', ');
             const values = Object.values(object);
             const queryString = `INSERT INTO ${this.table} (${columns}) VALUES (${values.map((v, i) => `$${i + 1}`).join(', ')}) RETURNING *;`
-            return (await this.pool.query(queryString, values)).rows;
+            return (await this.client.query(queryString, values)).rows;
         } catch (err) {
             console.error(`PostgreSQL error ${err}`)
         }
@@ -27,7 +26,7 @@ export default class Postgresql {
     async read(condition = "") {
         try {
             const query = `SELECT * FROM ${this.table} ${condition}`;
-            return (await this.pool.query(query)).rows;
+            return (await this.client.query(query)).rows;
         } catch (err) {
             console.error(`PostgreSQL error ${err}`)
         }
@@ -38,7 +37,7 @@ export default class Postgresql {
             const values = Object.values(object);
             const setString = columns.map((column, i) => `${column} = $${i + 1}`).join(', ');
             const queryString = `UPDATE ${this.table} SET ${setString} ${condition} RETURNING *;`
-            return (await this.pool.query(queryString, values)).rows;
+            return (await this.client.query(queryString, values)).rows;
         } catch (err) {
             console.error(`PostgreSQL error ${err}`)
         }
@@ -46,22 +45,10 @@ export default class Postgresql {
     async delete(condition) {
         try {
             const queryString = `DELETE  FROM ${this.table} ${condition}`
-            return (await this.pool.query(queryString)).rows;
+            return (await this.client.query(queryString)).rows;
         } catch (err) {
             console.error(`PostgreSQL error ${err}`)
         }
     }
 }
 
-/* 
-    {
-        gameId: VARCHAR(255),
-        userOne: VARCHAR(255),
-        userTwo: VARCHAR(255),
-        isFull: BOOLEAN,
-        team: VARCHAR,
-        boardPieces: "JSON",
-        moveList: "JSON",
-        turns: INT
-    }
-*/

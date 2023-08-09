@@ -1,10 +1,12 @@
 import { Server } from "socket.io";
 import Game from "../models/Game.schema.js";
+import config from '../config/config.js';
+const { IO_CLIENT } = config;
 const GameDB = new Game();
 function gameServer (server) {
     const io = new Server(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: IO_CLIENT,
             methods: ["GET", "POST"]
         }
     });

@@ -3,7 +3,7 @@ import Postgresql from "../database/Database.js";
 export default class Game extends Postgresql{
     constructor() {
         super('game');
-        this.createTable()
+        this.createTable();
     }
     async createTable() {
         try {
@@ -19,7 +19,7 @@ export default class Game extends Postgresql{
                     turns INT
             );
             `;
-            await this.pool.query(query);
+            await this.client.query(query);
         } catch (err) {
             console.error(err);
         }
