@@ -12,10 +12,17 @@ export default function Chessboard({ playMove, pieces, turn }) {
     const chessboardRef = useRef(null);
     const board = [];
     useEffect(() => {
-        if(!chessboardRef.current) return;
-        const getChessboardlength = chessboardRef.current.clientWidth;
-        setChessboardLength(getChessboardlength);
-        setSquareLength(getChessboardlength / 8);
+        const updateChessboardSize = () => {
+            if (!chessboardRef.current) return;
+            const getChessboardlength = chessboardRef.current.clientWidth;
+            setChessboardLength(getChessboardlength);
+            setSquareLength(getChessboardlength / 8);
+        };
+        window.addEventListener('resize', updateChessboardSize);
+        updateChessboardSize();
+        return () => {
+            window.removeEventListener('resize', updateChessboardSize);
+        };
     }, []);
     const grabPiece = (e) => {
         const element = e.target;
@@ -23,13 +30,13 @@ export default function Chessboard({ playMove, pieces, turn }) {
         if (element.classList.contains("chess-piece") && chessboard) {
             const grabX = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / squareLength) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - chessboardLength) / squareLength));
             const grabY = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - chessboardLength) / squareLength)) : Math.floor((e.clientY - chessboard.offsetTop) / squareLength);
-            setGrabPosition({ x: grabX, y: grabY });
             const x = e.clientX - squareLength / 2;
             const y = e.clientY - squareLength / 2;
             element.style.position = "absolute";
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
 
+            setGrabPosition({ x: grabX, y: grabY });
             setActivePiece(element);
         }
 
@@ -75,7 +82,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
             const currentPiece = pieces.find(p => p.samePosition(grabPosition));
 
             if (currentPiece) {
-                const isValidMove = playMove(currentPiece.clone(), new Position(x, y)); 
+                const isValidMove = playMove(currentPiece.clone(), new Position(x, y));
                 if (!isValidMove) {
                     // RESETS THE PIECE POSITION
                     activePiece.style.location = "relative";
@@ -98,12 +105,12 @@ export default function Chessboard({ playMove, pieces, turn }) {
                 let highlight;
                 if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => p.samePosition({ x: j, y: i })) : false;
                 board.push(<Square key={`${j}${i}`} squareLength={squareLength} number={number} image={image} highlight={highlight} />);
-                
+
             }
         }
     } else {
         for (let i = 0; i < VERTICAL_AXIS.length; i++) {
-            for (let j = HORIZONTAL_AXIS.length - 1; j >= 0 ; j--) {
+            for (let j = HORIZONTAL_AXIS.length - 1; j >= 0; j--) {
                 const number = j + i;
                 const piece = pieces.find(p => p.samePosition({ x: j, y: i }));
                 const image = piece ? piece.image : undefined;
@@ -121,8 +128,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
                 onMouseDown={e => grabPiece(e)}
                 onMouseUp={e => dropPiece(e)}
                 className='chessboard'
-                ref={chessboardRef}
-            >
+                ref={chessboardRef}>
                 {board}
             </div>
         </>

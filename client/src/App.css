@@ -5,7 +5,7 @@
   font-family: 'Cabin Condensed', sans-serif;
 }
 :root {
-  --chessboardLength: 500px;
+  --chessboardLength: 450px;
   --width: calc(var(--chessboardLength) / 8) ; 
   --height: calc(var(--chessboardLength) / 8);
 }
@@ -38,6 +38,6 @@ body{
 }
 @media (width < 480px) {
   :root{
-      --chessboardLength: 330px;
+      --chessboardLength: 320px;
   }
 }
