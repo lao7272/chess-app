@@ -17,5 +17,9 @@
     column-gap: 10px;
     row-gap: 3px;
 }
-
+.return-home {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
 

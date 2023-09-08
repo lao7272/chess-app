@@ -1,43 +1,43 @@
-.tile {
+.square {
     display: flex;
-    width: 62.5px;
-    height: 62.5px;
     justify-content: center;
     align-items: center;
+    width: var(--width);
+    height: var(--height);
 }
 
-.tile .chess-piece{
-    width: 62.5px;
-    height: 62.5px;
+.square .chess-piece{
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 55px;
+    background-size: var(--width);
+    width: var(--width);
+    height: var(--height);
 }
 
-.tile .chess-piece:hover{
+.square .chess-piece:hover{
     cursor: grab;
 }
-.tile .chess-piece:active{
+.square .chess-piece:active{
     cursor: grabbing;
 }
-.black-tile {
+.black-square {
     background-color: #D08A46;
 }
-.white-tile {
+.white-square {
     background-color: #FFCD9D;
 }
-.highlighted-tile:not(.chess-piece-tile)::before {
+.highlighted-square:not(.chess-piece-square)::before {
     content: ' ';
-    width: 18px;
-    height: 18px;
+    width: calc(var(--height) / 3.3);
+    height:  calc(var(--height) / 3.3);
     border-radius: 99%;
     background-color: rgba(0, 0, 0, 0.2);
 }
-.highlighted-tile.chess-piece-tile::before {
+.highlighted-square.chess-piece-square::before {
     position: absolute;
     content: ' ';
-    width: 53.5px;
-    height: 53.5px;
+    width: var(--width);
+    height: var(--height);
     border: 4px solid rgba(0, 0, 0, 0.2);
     border-radius: 99%;
 }

@@ -4,6 +4,11 @@
   margin: 0;
   font-family: 'Cabin Condensed', sans-serif;
 }
+:root {
+  --chessboardLength: 500px;
+  --width: calc(var(--chessboardLength) / 8) ; 
+  --height: calc(var(--chessboardLength) / 8);
+}
 body{
   background-color: #312e2b;
 }
@@ -26,3 +31,13 @@ body{
   scale: 1;
 }
 
+@media (width < 768px) {
+  :root{
+      --chessboardLength: 400px;
+  }
+}
+@media (width < 480px) {
+  :root{
+      --chessboardLength: 330px;
+  }
+}

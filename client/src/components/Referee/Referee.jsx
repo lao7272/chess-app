@@ -7,6 +7,7 @@ import DisplayAxis from '../DisplayAxes/DisplayAxes';
 import { initialChessboard } from '../../Constants';
 import { Bishop, Knight, Queen, Rook } from '../../models/pieces';
 import './Referee.css';
+import ReturnHome from '../ReturnHome/ReturnHome';
 
 export default function Referee({
     onlineTeam,
@@ -239,6 +240,7 @@ export default function Referee({
     return (
         <>
             <main className='main-container'>
+                <ReturnHome/>
                 <div className='chessboard-container'>
                     <DisplayAxis turn={turn} />
                     <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn} />

@@ -1,7 +1,6 @@
 import { Position, Chessboard} from "./models";
 import { Pawn, Knight, Bishop, Rook, Queen, King } from "./models/pieces"
 
-const GRID_SIZE = 62.5; 
 
 const VERTICAL_AXIS = ['1', '2', '3', '4', '5', '6', '7', '8'];
 const HORIZONTAL_AXIS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -43,6 +42,5 @@ const initialChessboard = new Chessboard([
 export {
     HORIZONTAL_AXIS,
     VERTICAL_AXIS, 
-    initialChessboard,
-    GRID_SIZE
+    initialChessboard
 }

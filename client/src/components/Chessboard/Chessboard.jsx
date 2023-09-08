@@ -1,25 +1,31 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Chessboard.css';
 import Square from '../Square/Square';
-import { VERTICAL_AXIS, HORIZONTAL_AXIS, GRID_SIZE } from '../../Constants';
+import { VERTICAL_AXIS, HORIZONTAL_AXIS } from '../../Constants';
 import { Position } from '../../models';
 
 export default function Chessboard({ playMove, pieces, turn }) {
     const [activePiece, setActivePiece] = useState(null);
     const [grabPosition, setGrabPosition] = useState({ x: -1, y: -1 });
-
+    const [chessboardLength, setChessboardLength] = useState(0);
+    const [squareLength, setSquareLength] = useState(0);
     const chessboardRef = useRef(null);
-    let board = [];
-
+    const board = [];
+    useEffect(() => {
+        if(!chessboardRef.current) return;
+        const getChessboardlength = chessboardRef.current.clientWidth;
+        setChessboardLength(getChessboardlength);
+        setSquareLength(getChessboardlength / 8);
+    }, []);
     const grabPiece = (e) => {
         const element = e.target;
         const chessboard = chessboardRef.current;
         if (element.classList.contains("chess-piece") && chessboard) {
-            const grabX = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - 500) / GRID_SIZE));
-            const grabY = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 500) / GRID_SIZE)) : Math.floor((e.clientY - chessboard.offsetTop) / GRID_SIZE);
+            const grabX = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / squareLength) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - chessboardLength) / squareLength));
+            const grabY = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - chessboardLength) / squareLength)) : Math.floor((e.clientY - chessboard.offsetTop) / squareLength);
             setGrabPosition({ x: grabX, y: grabY });
-            const x = e.clientX - GRID_SIZE / 2;
-            const y = e.clientY - GRID_SIZE / 2;
+            const x = e.clientX - squareLength / 2;
+            const y = e.clientY - squareLength / 2;
             element.style.position = "absolute";
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
@@ -37,8 +43,8 @@ export default function Chessboard({ playMove, pieces, turn }) {
             const maxX = chessboard.offsetLeft + chessboard.clientWidth - 50;
             const maxY = chessboard.offsetTop + chessboard.clientHeight - 53;
 
-            const x = e.clientX - GRID_SIZE / 2;
-            const y = e.clientY - GRID_SIZE / 2;
+            const x = e.clientX - squareLength / 2;
+            const y = e.clientY - squareLength / 2;
 
             let xValue = `${x}px`;
             let yValue = `${y}px`;
@@ -64,8 +70,8 @@ export default function Chessboard({ playMove, pieces, turn }) {
     const dropPiece = (e) => {
         const chessboard = chessboardRef.current;
         if (activePiece && chessboard) {
-            const x = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - 500) / GRID_SIZE));
-            const y = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - 500) / GRID_SIZE)) : Math.floor((e.clientY - chessboard.offsetTop) / GRID_SIZE);
+            const x = turn === 'white' ? Math.floor((e.clientX - chessboard.offsetLeft) / squareLength) : Math.abs(Math.ceil((e.clientX - chessboard.offsetLeft - chessboardLength) / squareLength));
+            const y = turn === 'white' ? Math.abs(Math.ceil((e.clientY - chessboard.offsetTop - chessboardLength) / squareLength)) : Math.floor((e.clientY - chessboard.offsetTop) / squareLength);
             const currentPiece = pieces.find(p => p.samePosition(grabPosition));
 
             if (currentPiece) {
@@ -81,7 +87,6 @@ export default function Chessboard({ playMove, pieces, turn }) {
 
         setActivePiece(null);
     }
-    
 
     if (turn === 'white') {
         for (let i = VERTICAL_AXIS.length - 1; i >= 0; i--) {
@@ -92,7 +97,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
                 const currentPiece = pieces.find(p => p.samePosition(grabPosition));
                 let highlight;
                 if (currentPiece && activePiece) highlight = currentPiece.possibleMoves ? currentPiece.possibleMoves.some(p => p.samePosition({ x: j, y: i })) : false;
-                board.push(<Square key={`${j}${i}`} number={number} image={image} highlight={highlight} />);
+                board.push(<Square key={`${j}${i}`} squareLength={squareLength} number={number} image={image} highlight={highlight} />);
                 
             }
         }

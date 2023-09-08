@@ -1,9 +1,9 @@
 .chessboard {
     display: grid;
-    grid-template-columns: repeat(8, 62.5px);
-    grid-template-rows: repeat(8, 62.5px);
-    width: 31.25rem;
-    height: 31.25rem;
+    width: var(--chessboardLength);
+    height: var(--chessboardLength);
+    grid-template-columns: repeat(8, var(--width));
+    grid-template-rows: repeat(8, var(--width));
     background: #ccc;
     grid-area: c;
     resize: both;

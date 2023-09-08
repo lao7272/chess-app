@@ -1,9 +1,10 @@
+
 .horizontal {
     display: flex;
 }
 .horizontal > p {
     color: #fff;
-    width: 62.5px;
+    width: var(--width);
     text-align: center;
     user-select: none;
 }
@@ -14,7 +15,7 @@
 }
 .vertical > p {
     color: #fff;
-    height: 62.5px;
+    height: var(--height);
     display: flex;
     align-items: center;
     user-select: none;
