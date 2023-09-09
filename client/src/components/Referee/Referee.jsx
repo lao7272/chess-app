@@ -241,11 +241,14 @@ export default function Referee({
         <>
             <main className='main-container'>
                 <ReturnHome/>
-                <div className='chessboard-container'>
-                    <DisplayAxis turn={turn} />
-                    <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn} />
-                    <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef} />
-                    <GameOverAlert gameOver={gameOver} resign={resign} />
+
+                <div className="chessboard-container">
+                    <div className='chessboard-wrapper'>
+                        <DisplayAxis turn={turn} />
+                        <ChessBoard playMove={playMove} pieces={chessboard.pieces} turn={turn} />
+                        <PromotionAlert setPromotionTeam={setPromotionTeam} promotePawn={promotePawn} promoteRef={promoteRef} />
+                        <GameOverAlert gameOver={gameOver} resign={resign} />
+                    </div>
                 </div>
                 <MoveList
                     moveList={moveList}

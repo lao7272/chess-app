@@ -6,9 +6,10 @@
     flex-wrap: wrap;
     gap: 1.5rem;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
 }
-.chessboard-container{
+
+.chessboard-wrapper{
     display: grid;
     grid-template-areas: 
     ". h-a ."
@@ -22,4 +23,10 @@
     top: 10px;
     left: 10px;
 }
-
+@media (width < 768px) {
+    .chessboard-container {
+        height: 100vh;
+        display: grid;
+        place-content: center;
+    }
+}
