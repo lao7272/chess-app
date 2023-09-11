@@ -1,7 +1,7 @@
 import React from 'react';
 import "./Square.css";
 
-export default function ({number, image, highlight}) {
+export default function Square ({number, image, highlight}) {
     const className = [
         'square', 
         number % 2 === 0 && "black-square", 

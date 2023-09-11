@@ -45,6 +45,7 @@ export default function GameOnline({ socket }) {
         setRematchRoom(initialState.rematchRoom);
     };
     useEffect(() => {
+        console.log('reconnection')
         socket.on("connect", () => {
             socket.emit("join-room", state.room);
             socket.emit("user-reconnected", state.room);
@@ -54,7 +55,7 @@ export default function GameOnline({ socket }) {
             setOpponentMove(data);
         });
         if (state.gameData) setOpponentMove(state.gameData);
-    }, []);
+    }, [socket, state.gameData, state.room]);
 
     useEffect(() => {
         if (!socket) return;
@@ -121,7 +122,7 @@ useEffect(() => {
     }
     if (!move) return
     socket.emit('move', move, state.room);
-}, [move, gameOverOnline]);
+}, [move, gameOverOnline, state.room, socket]);
 useEffect(() => {
     if (resign && !gameOverOnline) {
         socket.emit("resign", { room: state.room, team: state.team });
@@ -158,7 +159,19 @@ useEffect(() => {
         resetComponentProperties();
     }
 
-}, [resign, drawOffer, drawOfferRes, rematch, rematchRes, rematchRoom]);
+}, [
+    resign, 
+    drawOffer, 
+    drawOfferRes, 
+    rematch, 
+    rematchRes, 
+    rematchRoom, 
+    gameOverOnline, 
+    navigate, 
+    socket,
+    state.room,
+    state.team
+]);
 
 return (<Referee key={state.room}
     onlineTeam={state.team}

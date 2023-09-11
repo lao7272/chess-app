@@ -50,7 +50,7 @@ export default function Referee({
         } else {
             chessboard.getPossibleMoves();
         }
-    }, []);
+    }, [chessboard, onlineTeam]);
 
     useEffect(() => {
         if (gameOverOnline) {
@@ -77,7 +77,7 @@ export default function Referee({
             };
             return clonedChessboard;
         });
-    }, [opponentMove, gameOverOnline]);
+    }, [opponentMove, gameOverOnline, onlineTeam, setGameOverOnline]);
     useEffect(() => {
         if (!state || !state.rematch) return;
         setGameOver(null);
@@ -91,7 +91,7 @@ export default function Referee({
             return clonedChessboard;
         });
         return;
-    }, [state]);
+    }, [state, onlineTeam]);
     useEffect(() => {
         if(chessboard.totalTurns === 1) return;
         if(!currPiece) return;
@@ -123,7 +123,18 @@ export default function Referee({
             moveList: chessboard.moveList
         })
         setCurrPiece(null);
-    }, [chessboard]);
+    }, [
+        chessboard,
+        check,
+        currPiece,
+        grabPosition,
+        onlineTeam,
+        pawnPromotion,
+        prevPiecesLen,
+        room,
+        setMove,
+        turn
+    ]);
     function playMove(currentPiece, desiredPosition) {
         if (currentPiece.team === "white" && chessboard.totalTurns % 2 !== 1) return false;
         if (currentPiece.team === "black" && chessboard.totalTurns % 2 !== 0) return false;

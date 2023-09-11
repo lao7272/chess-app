@@ -24,7 +24,7 @@ export default function PlayOnlineAlert({socket, playOnline}) {
                 gameData: gameData
             }});
         }
-    }, [room]);
+    }, [room, gameData, navigate, team]);
     useEffect(() => {
         if(!containerRef.current) return;
         if(playOnline) {

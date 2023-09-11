@@ -188,6 +188,8 @@ export default class Chessboard {
                 case "king":
                     newPieces.push(new King(new Position(piece.position.x, piece.position.y), piece.team, piece.hasMoved));
                     break;
+                default :
+                return;
             }
 
         }

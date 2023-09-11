@@ -21,4 +21,4 @@ app.get("/game/:id", async (req, res) => {
     res.json(getRoom);
 })
 
-httpServer.listen(PORT, () => console.log(`Running at http://localhost:${PORT}`));
+httpServer.listen(PORT, () => console.log(`Server running`));
