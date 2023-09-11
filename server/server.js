@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import cors from "cors";
 import config from "./src/config/config.js";
+import corsConfig from "./src/config/corsConfig.js";
 import gameServer from "./src/modules/socket.js";
 import Game from "./src/models/Game.schema.js";
 const GameDB = new Game();
@@ -13,7 +14,7 @@ const { PORT } = config;
 
 gameServer(httpServer);
 
-app.use(cors());
+app.use(cors(corsConfig));
 
 app.get("/game/:id", async (req, res) => {
     const {id} = req.params;

@@ -1,16 +1,9 @@
 import { Server } from "socket.io";
 import Game from "../models/Game.schema.js";
-import config from '../config/config.js';
-const { IO_CLIENT } = config;
+import corsConfig from '../config/corsConfig.js';
 const GameDB = new Game();
 function gameServer (server) {
-    const io = new Server(server, {
-        cors: {
-            origin: IO_CLIENT,
-            methods: ["GET", "POST"]
-        }
-    });
-
+    const io = new Server(server, {cors: corsConfig});
     io.on("connection", async socket => {
         console.log(`Socket connected. Id: ${socket.id}`);
         socket.on("generate-room", async () => {
@@ -141,10 +134,8 @@ function gameServer (server) {
                 if(!room) return;
                 if(socket.id === room.user_one) {
                     await GameDB.update({user_one: null, is_full: false}, `WHERE user_one = '${socket.id}'`);
-                    console.log("User One Deleted");
                 } else if (socket.id === room.user_two) {
                     await GameDB.update({user_two: null, is_full: false}, `WHERE user_two = '${socket.id}'`);
-                    console.log("User Two Deleted");
                 } 
             } catch (err) {
                 console.error(err)
