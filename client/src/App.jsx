@@ -6,7 +6,6 @@ import Home from './components/Home/Home';
 import io from "socket.io-client";
 import OnlineGame from './components/OnlineGame/OnlineGame';
 function App() {
-  console.log(process.env.REACT_APP_SERVER)
   const socket = io.connect(process.env.REACT_APP_SERVER);
   const router = createBrowserRouter(
     createRoutesFromElements(

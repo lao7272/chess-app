@@ -7,4 +7,5 @@
     background: #ccc;
     grid-area: c;
     resize: both;
+    touch-action: none;
 }
