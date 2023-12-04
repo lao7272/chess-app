@@ -15,10 +15,10 @@
     height: var(--height);
 }
 
-.square .chess-piece:hover{
+.square .grab-piece:hover{
     cursor: grab;
 }
-.square .chess-piece:active{
+.square .grab-piece:active{
     cursor: grabbing;
 }
 .black-square {

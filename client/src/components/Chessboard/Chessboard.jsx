@@ -29,6 +29,7 @@ export default function Chessboard({ playMove, pieces, turn }) {
         const element = e.target;
         const chessboard = chessboardRef.current;
         if (!element.classList.contains("chess-piece") || !chessboard) return;
+        if(!element.classList.contains(turn)) return;
         const isTouch = e.touches ? true : false;
         const clientX = isTouch ? e.touches[0].pageX : e.clientX;
         const clientY = isTouch ? e.touches[0].pageY : e.clientY;
@@ -105,26 +106,27 @@ export default function Chessboard({ playMove, pieces, turn }) {
         if(isAGrabbedPiece) setActivePiece(null)
         else setClickedPiece(null);
     }
-    const displayBoard = (y, x) => {
+    const displayBoard = (y, x, isWhiteTurn) => {
         const number = y + x;
         const position = { x, y };
         const piece = pieces.find(p => p.samePosition(position));
         const image = piece ? piece.image : undefined;
+        const team = piece ? piece.team : "";
         const currentPiece = pieces.find(p => p.samePosition(grabPosition));
         let highlight = currentPiece && currentPiece.possibleMoves && currentPiece.possibleMoves.some(p => p.samePosition(position));
         let selected = currentPiece && currentPiece.samePosition(position);
-        board.push(<Square key={`${x}${y}`} squareLength={squareLength} number={number} image={image} highlight={highlight} selected={selected} moveToSquare={dropPiece} />);
+        board.push(<Square key={`${x}${y}`} team={team} squareLength={squareLength} number={number} image={image} highlight={highlight} selected={selected} moveToSquare={dropPiece} turn={turn}/>);
     }
     if (turn === 'white') {
         for (let i = VERTICAL_AXIS.length - 1; i >= 0; i--) {
             for (let j = 0; j < HORIZONTAL_AXIS.length; j++) {
-                displayBoard(i, j);
+                displayBoard(i, j, true);
             }
         }
     } else {
         for (let i = 0; i < VERTICAL_AXIS.length; i++) {
             for (let j = HORIZONTAL_AXIS.length - 1; j >= 0; j--) {
-                displayBoard(i, j);
+                displayBoard(i, j, false);
             }
         }
     }
